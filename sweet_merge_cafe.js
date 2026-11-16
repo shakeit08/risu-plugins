@@ -2038,7 +2038,7 @@ function toast(html, opt = {}) {
   setTimeout(() => { t.animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(-8px)' }], { duration: 250 }).onfinish = () => t.remove(); }, opt.ms || 2600);
 }
 const NOTES = [
-  ['2.5.1', ['2장 새 주민들도 강가 거리를 걸어 다녀요.']],
+  ['2.5.1', ['2장 새 주민들도 강가 거리를 걸어 다녀요.', '2장이 열리면 마을 광장(시즌 이벤트)도 강가 거리 끝으로 옮겨 와요.']],
   ['2.5.0', ['2장 「강가 거리」가 열려요! 구름언덕역을 완성하면 시작돼요.', '새 가게 4곳: 사진관 · 잡화점 · 목욕탕 · 선착장', '새 주민 4마리: 단풍(여우) · 도토리(너구리) · 몽실(양) · 퐁당(오리)', '잡화점을 완성하면 사탕 생산기가 생겨요.', '마을 화면 위에서 1장/2장을 바꿔 볼 수 있어요.']],
   ['2.4.6', ['업데이트 내역 창이 생겼어요. 설정 → 업데이트 내역에서 다시 볼 수 있어요.']],
   ['2.4.5', ['리스 설정 → 플러그인에서 업데이트 버튼으로 바로 업데이트할 수 있어요.']],
@@ -2294,7 +2294,7 @@ function openTown() {
   renderTown(true);
 }
 let townCh = 1;
-const chOf = A => A.ch || 1;
+const chOf = A => A.event ? (done('station') ? 2 : 1) : (A.ch || 1);
 function renderTown(first) {
   const v = $('.mc-town'); if (!v) return;
   const ch2 = done('station');
