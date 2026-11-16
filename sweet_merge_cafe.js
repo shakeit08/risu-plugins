@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.9.2
+//@version 2.9.3
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -717,7 +717,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS };
 })();
-const VER = '2.9.2';
+const VER = '2.9.3';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS } = ART;
@@ -1852,7 +1852,7 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 .tw-st img{width:100%;height:100%;object-fit:contain;object-position:bottom;display:block;pointer-events:none;filter:drop-shadow(0 4px 0 rgba(91,58,50,.18))}
 .tw-st.lk img{filter:grayscale(.6) brightness(.9);opacity:.75}
 .tw-st.empty .pl{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);width:34px;height:34px;border:2.5px dashed #5b3a32;border-radius:50%;background:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;font-size:22px;color:#5b3a32}
-.tw-st.can .bdg{scale:max(.75,min(1,var(--u)*.8));transform-origin:50% 100%;position:absolute;left:50%;top:-6px;transform:translate(-50%,-100%);display:flex;align-items:center;gap:1px;background:#fff;border:2.5px solid #5b3a32;border-radius:99px;padding:0 7px;font-size:13px;box-shadow:0 2px 0 #5b3a32;animation:stb 1.1s ease-in-out infinite;white-space:nowrap}
+.tw-st.can .bdg{scale:max(.75,min(1,var(--u)*.8));transform-origin:50% 100%;position:absolute;left:50%;top:-6px;transform:translate(-50%,-100%);display:flex;align-items:center;gap:1px;background:#fff;border:2.5px solid #5b3a32;border-radius:99px;padding:0 7px;font-size:13px;box-shadow:0 2px 0 #5b3a32;white-space:nowrap}
 .tw-pop{position:absolute;z-index:999999;transform:translate(-50%,-100%);background:#fffdf8;border:2.5px solid #5b3a32;border-radius:16px;box-shadow:0 3px 0 #5b3a32;padding:7px 10px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:118px;white-space:nowrap}
 .tw-pop::after{content:'';position:absolute;left:50%;bottom:-7px;width:10px;height:10px;background:#fffdf8;border-right:2.5px solid #5b3a32;border-bottom:2.5px solid #5b3a32;transform:translateX(-50%) rotate(45deg)}
 .tw-pop b{font-weight:normal;font-size:15px}.tw-pop .dots{display:flex;gap:4px}.tw-pop .dots i{width:9px;height:9px;border-radius:50%;border:2px solid #5b3a32;background:#fff}.tw-pop .dots i.on{background:#ffd75a}
@@ -1880,7 +1880,7 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 .mc-cafe:not(.lst) .cf-scene{height:auto;width:calc(100% - 20px);max-width:520px}
 .cf-mk{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;gap:1px;font-family:inherit;font-size:13px;color:#5b3a32;background:rgba(255,255,255,.92);border:2.5px solid #5b3a32;border-radius:99px;padding:1px 8px;box-shadow:0 2px 0 #5b3a32;cursor:pointer;z-index:3;white-space:nowrap}
 .cf-mk i{display:inline-block;width:14px;height:14px}
-.cf-mk.can{background:#ffd75a;animation:stb 1.1s ease-in-out infinite}
+.cf-mk.can{background:#ffd75a}
 .cf-mk.new::before{content:'+';margin-right:2px}
 .cf-mk.sel{background:#ff8fa3;color:#fff;animation:none;transform:translate(-50%,-50%) scale(1.12)}
 .mc-cafe.lst .cf-sel{display:none}
