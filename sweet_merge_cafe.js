@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.5.1
+//@version 2.5.2
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -707,7 +707,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK };
 })();
-const VER = '2.5.1';
+const VER = '2.5.2';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK } = ART;
@@ -2038,7 +2038,8 @@ function toast(html, opt = {}) {
   setTimeout(() => { t.animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(-8px)' }], { duration: 250 }).onfinish = () => t.remove(); }, opt.ms || 2600);
 }
 const NOTES = [
-  ['2.5.1', ['2장 새 주민들도 강가 거리를 걸어 다녀요.', '2장이 열리면 마을 광장(시즌 이벤트)도 강가 거리 끝으로 옮겨 와요.', '동네 공원 소품 배치를 고쳤어요.']],
+  ['2.5.2', ['2장이 열리면 마을 광장(시즌 이벤트)도 강가 거리 끝으로 옮겨 와요.', '동네 공원 소품 배치를 고쳤어요.']],
+  ['2.5.1', ['2장 새 주민들도 강가 거리를 걸어 다녀요.']],
   ['2.5.0', ['2장 「강가 거리」가 열려요! 구름언덕역을 완성하면 시작돼요.', '새 가게 4곳: 사진관 · 잡화점 · 목욕탕 · 선착장', '새 주민 4마리: 단풍(여우) · 도토리(너구리) · 몽실(양) · 퐁당(오리)', '잡화점을 완성하면 사탕 생산기가 생겨요.', '마을 화면 위에서 1장/2장을 바꿔 볼 수 있어요.']],
   ['2.4.6', ['업데이트 내역 창이 생겼어요. 설정 → 업데이트 내역에서 다시 볼 수 있어요.']],
   ['2.4.5', ['리스 설정 → 플러그인에서 업데이트 버튼으로 바로 업데이트할 수 있어요.']],
