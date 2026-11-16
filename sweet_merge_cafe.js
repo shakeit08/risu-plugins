@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.11.1
+//@version 2.11.4
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -724,7 +724,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL };
 })();
-const VER = '2.11.1';
+const VER = '2.11.4';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL } = ART;
@@ -1088,7 +1088,7 @@ function sanitize(o) {
   if (o.shop && typeof o.shop.day === 'string') s.shop = { day: o.shop.day, buys: +o.shop.buys || 0 };
   if (o.tools && typeof o.tools === 'object') for (const k of ['cut', 'up']) s.tools[k] = Math.max(0, Math.min(999, Math.floor(+o.tools[k] || 0)));
   if (Number.isInteger(o.storeN)) s.storeN = Math.max(3, Math.min(STORE_MAX, o.storeN));
-  if (Array.isArray(o.store)) s.store = Array.from({ length: s.storeN }, (_, k) => { const v = validItem(o.store[k]); return v && (v.c || v.tool) ? v : null; });
+  if (Array.isArray(o.store)) s.store = Array.from({ length: s.storeN }, (_, k) => { const v = validItem(o.store[k]); return v || null; });
   for (const k of ['cut', 'up']) if (s.tools[k] > 0) { const n = s.tools[k]; s.tools[k] = 0; const h = s.store.find(x => x && x.tool === k); if (h) h.n = (h.n || 1) + n; else { const e = s.store.findIndex(x => !x), it = n > 1 ? { tool: k, n } : { tool: k }; if (e >= 0) s.store[e] = it; else s.pendingItems.push(it); } }
   if (o.spin && typeof o.spin.d === 'string') s.spin = { d: o.spin.d };
   if (o.tbuy && typeof o.tbuy.d === 'string') s.tbuy = { d: o.tbuy.d, cut: +o.tbuy.cut || 0, up: +o.tbuy.up || 0 };
@@ -1349,7 +1349,6 @@ function dropAny(from, to) {
   const A = getIt(from), B = getIt(to);
   if (!A) return;
   const toSt = to >= STB, fromSt = from >= STB;
-  if (toSt && !A.c && !A.tool) { sfx('error'); toast('생산기·보따리는 보관함에 넣을 수 없어요.'); renderAll(); return; }
   if (!B) { setIt(to, A); setIt(from, null); sfx('drop'); if (!toSt) fx.push({ t: 'land', i: to }); }
   else if (A.tool && B.tool === A.tool) { B.n = tN(B) + tN(A); setIt(from, null); sfx('merge', 2); if (!toSt) fx.push({ t: 'merge', i: to }); }
   else if (A.c && B.c && A.c === B.c && A.l === B.l && A.l < maxLvOf(A.c)) {
@@ -1357,7 +1356,6 @@ function dropAny(from, to) {
     S.stats.merges++; sfx('merge', A.l + 1); discover(A.c, A.l + 1);
     if (!toSt) fx.push({ t: 'merge', i: to });
   } else {
-    if (fromSt && !B.c && !B.tool) { sfx('error'); toast('생산기·보따리는 보관함에 넣을 수 없어요.'); renderAll(); return; }
     setIt(to, A); setIt(from, B); sfx('drop');
     if (!toSt) fx.push({ t: 'land', i: to });
   }
@@ -1379,7 +1377,7 @@ function setToolMode(k) {
 }
 function toBox(i) {
   const it = S.board[i];
-  if (!it || !(it.c || it.tool)) { sfx('error'); toast('생산기·보따리는 보관함에 넣을 수 없어요.'); renderBoard(); return; }
+  if (!it) return;
   const hs = it.tool ? S.store.findIndex((x, n) => n < S.storeN && x && x.tool === it.tool) : -1;
   if (hs >= 0) { S.store[hs].n = tN(S.store[hs]) + tN(it); S.board[i] = null; if (sel === i) sel = -1; sfx('drop'); jelly($('.mc-boxb'), .4, 360); toast(`<b>${esc(TOOLS[it.tool].name)}</b>을(를) 보관함에 넣었어요.`, { icon: toolIcon(it.tool) }); placePending(); renderAll(); save(); return; }
   const k = S.store.findIndex((x, n) => n < S.storeN && !x);
@@ -1387,7 +1385,7 @@ function toBox(i) {
   if (slot < 0) { sfx('error'); toast('보관함이 꽉 찼어요! 보관함에서 칸을 늘릴 수 있어요.'); renderBoard(); return; }
   S.store[slot] = it; S.board[i] = null; if (sel === i) sel = -1;
   sfx('drop'); jelly($('.mc-boxb'), .4, 360);
-  toast(`<b>${esc(it.tool ? TOOLS[it.tool].name : CHAINS[it.c].items[it.l - 1])}</b>을(를) 보관함에 넣었어요.`, { icon: it.tool ? toolIcon(it.tool) : iconItem(it.c, it.l) });
+  toast(`<b>${esc(it.tool ? TOOLS[it.tool].name : it.b ? '보따리' : it.g ? genName(it.g, it.gl || 1) : CHAINS[it.c].items[it.l - 1])}</b>을(를) 보관함에 넣었어요.`, { icon: it.tool ? toolIcon(it.tool) : it.b ? iconBag(it.b) : it.g ? iconGen(it.g, it.gl || 1) : iconItem(it.c, it.l) });
   placePending(); renderAll(); save();
 }
 const toolCount = k => [S.store, S.board, (S.ev && S.ev.board) || [], S.pendingItems].reduce((s, a) => s + a.reduce((t, x) => t + (x && x.tool === k ? tN(x) : 0), 0), 0);
@@ -1402,8 +1400,8 @@ function openBox() {
   const body = m.querySelector('.mc-boxbody');
   const draw = () => {
     const used = S.store.filter(Boolean).length;
-    body.innerHTML = `<div class="mc-sec"><h4>보관 칸 <span class="mc-sub">${used}/${S.storeN} · 누르면 판으로 꺼내요</span></h4><div class="mc-bgrid">${Array.from({ length: S.storeN }, (_, k) => { const it = S.store[k]; return `<button class="bc ${it ? '' : 'em'}" ${it ? `data-out="${k}"` : ''}>${it ? (it.tool ? `<div class="it">${toolIcon(it.tool)}</div>${tBadge(it)}` : `<div class="it">${iconItem(it.c, it.l)}</div>${it.l >= 2 ? `<span class="lvb">${it.l}</span>` : ''}`) : ''}</button>`; }).join('')}${S.storeN < STORE_MAX ? `<button class="bc add" data-more><b>+</b><span><i>${UI.coin}</i>${STORE_COST[S.storeN]}</span></button>` : ''}</div>
-      <div class="mc-sub" style="margin-top:8px">판 위 재료나 가위·스프링클을 위쪽 보관함 버튼으로 끌어다 놓으면 넣을 수 있어요. 가위·스프링클은 판으로 꺼낸 뒤 재료에 끌어다 놓으면 써져요.</div></div>`;
+    body.innerHTML = `<div class="mc-sec"><h4>보관 칸 <span class="mc-sub">${used}/${S.storeN} · 누르면 판으로 꺼내요</span></h4><div class="mc-bgrid">${Array.from({ length: S.storeN }, (_, k) => { const it = S.store[k]; return `<button class="bc ${it ? '' : 'em'}" ${it ? `data-out="${k}"` : ''}>${it ? (it.tool ? `<div class="it">${toolIcon(it.tool)}</div>${tBadge(it)}` : it.b ? `<div class="it">${iconBag(it.b)}</div>` : it.g ? `<div class="it">${iconGen(it.g, it.gl || 1)}</div>` : `<div class="it">${iconItem(it.c, it.l)}</div>${it.l >= 2 ? `<span class="lvb">${it.l}</span>` : ''}`) : ''}</button>`; }).join('')}${S.storeN < STORE_MAX ? `<button class="bc add" data-more><b>+</b><span><i>${UI.coin}</i>${STORE_COST[S.storeN]}</span></button>` : ''}</div>
+      <div class="mc-sub" style="margin-top:8px">판 위 재료·생산기·보따리·가위·스프링클을 위쪽 보관함 버튼으로 끌어다 놓으면 넣을 수 있어요. 가위·스프링클은 판으로 꺼낸 뒤 재료에 끌어다 놓으면 써져요.</div></div>`;
   };
   draw();
   body.addEventListener('click', async ev => {
@@ -2358,7 +2356,7 @@ function onMove(ev) {
   drag.px = ev.clientX; drag.py = ev.clientY;
   const ue = document.elementFromPoint(ev.clientX, ev.clientY);
   const bx = ue?.closest('.mc-boxb');
-  document.querySelector('.mc-boxb')?.classList.toggle('tgt', !!bx && !!(getIt(drag.i)?.c || getIt(drag.i)?.tool));
+  document.querySelector('.mc-boxb')?.classList.toggle('tgt', !!bx && !!getIt(drag.i));
   const under = ue?.closest('.mc-board .c');
   const t = bx ? -2 : under ? +under.dataset.i : -1;
   if (t !== drag.tgt) {
@@ -2856,6 +2854,19 @@ function renderTown(first) {
     if (sg.length < 2) return;
     let d = `M${sg[0].p[0].toFixed(1)} ${sg[0].p[1].toFixed(1)}`;
     const pts = [sg[0].p];
+    if (townCh === 2) {
+      const P = sg.map(n => n.p), Q = [[2 * P[0][0] - P[1][0], 2 * P[0][1] - P[1][1]], ...P, [2 * P[P.length - 1][0] - P[P.length - 2][0], 2 * P[P.length - 1][1] - P[P.length - 2][1]]];
+      for (let i = 1; i < Q.length - 2; i++) {
+        const p0 = Q[i - 1], p1 = Q[i], p2 = Q[i + 1], p3 = Q[i + 2];
+        const d01 = Math.max(1, Math.hypot(p1[0] - p0[0], p1[1] - p0[1]) ** .5), d12 = Math.max(1, Math.hypot(p2[0] - p1[0], p2[1] - p1[1]) ** .5), d23 = Math.max(1, Math.hypot(p3[0] - p2[0], p3[1] - p2[1]) ** .5);
+        const m1 = [0, 1].map(j => d12 * ((p1[j] - p0[j]) / d01 - (p2[j] - p0[j]) / (d01 + d12)) + (p2[j] - p1[j])), m2 = [0, 1].map(j => d12 * ((p3[j] - p2[j]) / d23 - (p3[j] - p1[j]) / (d12 + d23)) + (p2[j] - p1[j]));
+        const c1 = [p1[0] + m1[0] / 3, p1[1] + m1[1] / 3], c2_ = [p2[0] - m2[0] / 3, p2[1] - m2[1] / 3];
+        d += `C${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${c2_[0].toFixed(1)} ${c2_[1].toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+        for (let t = .1; t <= 1.001; t += .1) { const u1 = 1 - t; pts.push([0, 1].map(j => u1 * u1 * u1 * p1[j] + 3 * u1 * u1 * t * c1[j] + 3 * u1 * t * t * c2_[j] + t * t * t * p2[j])); }
+      }
+      roads.push({ pts, w: PW }); allPts.push(...pts); paths.push({ d, w: PW });
+      return;
+    }
     for (let k = 1; k < sg.length; k++) {
       const A = sg[k - 1], B = sg[k], dx = Math.abs(B.p[0] - A.p[0]), dy = Math.abs(B.p[1] - A.p[1]);
       const la = A.t[0] ? Math.max(dx * .55, 8) : Math.max(dy * .7, 8), lb = B.t[0] ? Math.max(dx * .55, 8) : Math.max(dy * .7, 8);
@@ -2970,8 +2981,9 @@ function renderTown(first) {
   const rdF = paths.map(p => `<path d="${p.d}" stroke="url(#tw-pc)" stroke-width="${(p.w - 3).toFixed(1)}"/>`).join('');
   // round off the sharp inner corners of tight turns (morphological opening of the road shape)
   const rdR = (PW * .3).toFixed(1), HTs = HT.toFixed(0);
-  const rdLayer = (id, add, fill) => `<mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="${cw}" height="${HTs}"><g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"><g filter="url(#tw-open)">${paths.filter(p => !p.ring).map(p => `<path d="${p.d}" stroke-width="${(p.w + add).toFixed(1)}"/>`).join('')}</g>${paths.filter(p => p.ring).map(p => `<path d="${p.d}" stroke-width="${(p.w + add).toFixed(1)}"/>`).join('')}</g></mask><rect width="100%" height="100%" fill="${fill}" mask="url(#${id})"/>`;
-  const rdMask = `<filter id="tw-open" filterUnits="userSpaceOnUse" x="0" y="0" width="${cw}" height="${HTs}"><feGaussianBlur stdDeviation="${rdR}"/><feComponentTransfer><feFuncA type="linear" slope="14" intercept="-6.5"/></feComponentTransfer></filter>` +
+  const rdLayer = (id, add, fill) => `<mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="${cw}" height="${HTs}"><g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"><g filter="url(#tw-open${id.slice(-1)})">${paths.filter(p => !p.ring).map(p => `<path d="${p.d}" stroke-width="${(p.w + 6).toFixed(1)}"/>`).join('')}</g>${paths.filter(p => p.ring).map(p => `<path d="${p.d}" stroke-width="${(p.w + add).toFixed(1)}"/>`).join('')}</g></mask><rect width="100%" height="100%" fill="${fill}" mask="url(#${id})"/>`;
+  const rdF0 = (n, er) => `<filter id="tw-open${n}" filterUnits="userSpaceOnUse" x="0" y="0" width="${cw}" height="${HTs}"><feGaussianBlur stdDeviation="${rdR}"/><feComponentTransfer><feFuncA type="linear" slope="14" intercept="-6.5"/></feComponentTransfer>${er ? `<feMorphology operator="erode" radius="${er}"/>` : ''}</filter>`;
+  const rdMask = rdF0(1, 0) + rdF0(2, 2.5) + rdF0(3, 4.5) +
     rdLayer('tw-m1', 6, '#5b3a32') + rdLayer('tw-m2', 1, '#f7e6cf') + rdLayer('tw-m3', -3, 'url(#tw-pc)');
   const ground = `<svg class="tw-ground" width="${cw}" height="${HT.toFixed(0)}" viewBox="0 0 ${cw} ${HT.toFixed(0)}" xmlns="http://www.w3.org/2000/svg"><defs>
     <pattern id="tw-pg" patternUnits="userSpaceOnUse" width="${tg.toFixed(1)}" height="${tg.toFixed(1)}"><image href="${MAP.grass}" width="${tg.toFixed(1)}" height="${tg.toFixed(1)}"/></pattern>
