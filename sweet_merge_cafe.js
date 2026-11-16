@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.4.5
+//@version 2.4.6
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -698,6 +698,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, HOUSE, townLot, townFence, TOWN_BG, WALK };
 })();
+const VER = '2.4.6';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, HOUSE, townLot, townFence, TOWN_BG, WALK } = ART;
@@ -883,7 +884,7 @@ function newState() {
     board, rows: START_ROWS, chains: ['bakery', 'coffee'], orders: [],
     disc: Object.fromEntries(CHAIN_KEYS.map(c => [c, c === 'bakery' || c === 'coffee' ? [1] : []])),
     settings: { chatE: 3, sfx: 2, story: true }, story: { intro: false, seen: {} }, giftDay: '', shop: { day: '', buys: 0 },
-    stats: { merges: 0, orders: 0, made: 0 }, pendingGens: [], pendingItems: [], chatBonus: 0, snow: 0, ev: null, onEv: false, evTab: false, coll: {}, pokes: { d: '', l: [] }, nextId: 1,
+    stats: { merges: 0, orders: 0, made: 0 }, pendingGens: [], pendingItems: [], chatBonus: 0, snow: 0, ev: null, onEv: false, evTab: false, coll: {}, pokes: { d: '', l: [] }, seenVer: '', nextId: 1,
     stars: 0, decor: Object.fromEntries(ALL_SPOTS.map(d => [d.k, 0])), areaDone: {},
   };
   while (st.orders.length < 3) st.orders.push(genOrder(st));
@@ -922,6 +923,7 @@ function sanitize(o) {
   if (o.settings && o.settings.evPreview) s.settings.evPreview = true;
   if (o.coll && typeof o.coll === 'object') for (const k in o.coll) if (o.coll[k]) s.coll[k] = true;
   s.evTab = !!o.evTab;
+  if (typeof o.seenVer === 'string') s.seenVer = o.seenVer;
   if (o.pokes && typeof o.pokes.d === 'string' && Array.isArray(o.pokes.l)) s.pokes = { d: o.pokes.d, l: o.pokes.l.filter(k => typeof k === 'string') };
   if (o.story && typeof o.story === 'object') { s.story.intro = !!o.story.intro; if (o.story.seen && typeof o.story.seen === 'object') for (const k in STORY) if (o.story.seen[k]) s.story.seen[k] = true; }
   if (typeof o.giftDay === 'string') s.giftDay = o.giftDay;
@@ -1419,6 +1421,9 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 .mc-toast b{font-weight:normal;color:#e04a68}
 .mc-toast .mc-btn{font-size:12px;padding:2px 8px;margin-left:4px}
 @keyframes mcin{from{transform:translateY(-10px) scale(.9);opacity:0}}
+.mc-notes{max-height:46vh;overflow-y:auto;text-align:left;margin:4px 0 10px;display:flex;flex-direction:column;gap:8px}
+.mc-notes .nt b{font-weight:normal;color:#e04a68;font-size:15px}
+.mc-notes ul{margin:2px 0 0;padding-left:18px;font-size:14px;line-height:1.45}
 .mc-modal{position:absolute;inset:0;background:rgba(60,35,30,.42);display:flex;align-items:center;justify-content:center;z-index:50;animation:mcfade .15s}
 @keyframes mcfade{from{opacity:0}}
 .mc-card{background:#fff7ec;border:3px solid #5b3a32;border-radius:20px;width:min(92%,390px);max-height:88%;overflow:auto;padding:16px;box-shadow:0 5px 0 #5b3a32;animation:mcin .25s cubic-bezier(.3,1.5,.5,1)}
@@ -1967,6 +1972,25 @@ function toast(html, opt = {}) {
   while (box.children.length > 3) box.firstChild.remove();
   setTimeout(() => { t.animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(-8px)' }], { duration: 250 }).onfinish = () => t.remove(); }, opt.ms || 2600);
 }
+const NOTES = [
+  ['2.4.6', ['업데이트 내역 창이 생겼어요. 설정 → 업데이트 내역에서 다시 볼 수 있어요.']],
+  ['2.4.5', ['리스 설정 → 플러그인에서 업데이트 버튼으로 바로 업데이트할 수 있어요.']],
+  ['2.4.4', ['일부 백신이 플러그인을 잘못 차단하던 문제를 고쳤어요.']],
+  ['2.4.3', ['마을 주민을 톡 누르면 말을 걸어요.', '주민마다 하루 한 번 간식을 나눠 줘요 (⚡+2).']],
+  ['2.4.2', ['PC에서 마을을 휠·끌기·화살표로 넘길 수 있어요.']],
+  ['2.4.0', ['크리스마스 시즌 이벤트! (12월 1일~1월 7일)', '크리스마스 판에서 눈송이를 모아 마을 광장을 꾸며요.']],
+  ['2.3.0', ['일반/슈퍼 생산 스위치가 생겼어요. 슈퍼는 ⚡5로 높은 단계 재료가 나와요.']],
+  ['2.2.0', ['마을 주민들이 걸어 다니고, 서로 수다를 떨어요.']],
+  ['2.1.0', ['마을 전경이 생겼어요. 꾸민 가게들을 한눈에 볼 수 있어요.']],
+  ['2.0.0', ['같은 생산기 2개를 합치면 레벨업! (최대 Lv.5)', '레벨업하면 선물 보따리가 와요.']],
+];
+const verCmp = (a, b) => { const x = a.split('.').map(Number), y = b.split('.').map(Number); for (let i = 0; i < 3; i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) - (y[i] || 0); return 0; };
+function openNotes(since) {
+  const list = since ? NOTES.filter(([v]) => verCmp(v, since) > 0).slice(0, 4) : NOTES;
+  if (!list.length) return;
+  modal(`<h3>${since ? '업데이트 소식' : '업데이트 내역'}</h3><div class="mc-notes">${list.map(([v, items]) => `<div class="nt"><b>v${v}</b><ul>${items.map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>`).join('')}</div>
+    <div class="acts"><button class="mc-btn pk" data-x>확인</button></div>`);
+}
 function modal(html, onMount) {
   $('.mc-modal')?.remove();
   const m = document.createElement('div');
@@ -2049,6 +2073,7 @@ function openSettings() {
     <div class="mc-sec"><h4>시즌 이벤트</h4>
       <div class="mc-seg"><button class="mc-btn wh ${S.settings.evPreview ? 'on' : ''}" data-evp="1">미리 열기</button><button class="mc-btn wh ${S.settings.evPreview ? '' : 'on'}" data-evp="0">날짜대로</button></div>
       <div class="mc-sub" style="margin-top:4px">크리스마스: 12월 1일~1월 7일</div></div>
+    <div class="mc-sec"><h4>업데이트</h4><div class="mc-seg"><button class="mc-btn wh" data-notes>업데이트 내역 보기</button></div><div class="mc-sub" style="margin-top:4px">현재 버전 v${VER}</div></div>
     <div class="mc-sec"><h4>기록</h4>
       <div class="mc-stat"><span>합친 횟수</span><span>${S.stats.merges}</span></div>
       <div class="mc-stat"><span>완료한 주문</span><span>${S.stats.orders}</span></div>
@@ -2077,6 +2102,7 @@ function openSettings() {
     S.settings.story = b.dataset.story === '1'; save();
     m.querySelectorAll('[data-story]').forEach(x => x.classList.toggle('on', x === b));
   });
+  m.querySelector('[data-notes]').onclick = () => { m.remove(); openNotes(); };
   m.querySelector('[data-replay]').onclick = () => { m.remove(); const on = S.settings.story; S.settings.story = true; playStory('intro', () => { S.settings.story = on; save(); }); };
   m.querySelectorAll('[data-ce]').forEach(b => b.onclick = () => {
     S.settings.chatE = +b.dataset.ce; save();
@@ -2464,6 +2490,8 @@ async function openGame() {
       const evr = checkEvent();
       if (S.evTab && S.ev && !S.onEv) swapEv();
       if (evr) renderAll();
+      const prevVer = S.seenVer;
+      if (prevVer !== VER) { S.seenVer = VER; if (prevVer || S.level > 1) setTimeout(() => { if (!$('.mc-story') && !$('.mc-modal')) openNotes(prevVer || NOTES[4][0]); }, 500); }
       if (!S.story.intro) { S.story.intro = true; save(); playStory('intro'); }
       else if (evr === 'start' && !S.story.seen.xmas_intro) setTimeout(() => playStory('xmas_intro'), 400);
       else if (evr && evr.end) { playStory('xmas_end'); if (evr.gain) toast(`크리스마스 판에 남은 물건을 정산했어요 <span class="mc-mini">${UI.coin}+${evr.gain}</span>`); }
