@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.13.0
+//@version 2.13.1
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -738,7 +738,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill };
 })();
-const VER = '2.13.0';
+const VER = '2.13.1';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill } = ART;
@@ -1996,6 +1996,8 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 .tw-bub.long{white-space:normal;width:max-content;max-width:150px;font-size:13px;line-height:1.35;padding:4px 9px;z-index:2}
 .tw-w{position:absolute;left:0;will-change:transform}
 .tw-w img{height:100%;width:auto;display:block;filter:drop-shadow(0 3px 0 rgba(91,58,50,.18))}
+.tw-f{display:block;height:100%;position:relative}
+.tw-f img:not(.on){position:absolute;left:0;top:0;visibility:hidden}
 .tw-bub{position:absolute;left:50%;bottom:100%;transform:translate(-30%,0) scale(0);transform-origin:20% 100%;background:#fff;border:2.5px solid #5b3a32;border-radius:14px;padding:1px 8px;font-size:15px;line-height:1.4;white-space:nowrap;box-shadow:0 2px 0 #5b3a32;transition:transform .18s cubic-bezier(.3,1.5,.5,1)}
 .tw-bub::after{content:'';position:absolute;left:20%;bottom:-4px;width:5px;height:5px;background:#fff;border-right:2px solid #5b3a32;border-bottom:2px solid #5b3a32;transform:rotate(45deg) skew(8deg,8deg)}
 .tw-bub.on{transform:translate(-30%,0) scale(1)}
@@ -3401,13 +3403,13 @@ function startWalkers(lanes) {
     const el = document.createElement('div');
     el.className = 'tw-w';
     el.style.cssText = `height:${size.toFixed(0)}px;top:${(ln.G + ln.U * .11 - size).toFixed(0)}px;z-index:${Math.round((ln.G + ln.U * .11) * 10)}`;
-    el.innerHTML = `<img alt="" draggable="false"><div class="tw-bub"></div>`;
+    el.innerHTML = `<span class="tw-f">${(WALK[ANIMALS[ix].key] || []).map(u => `<img alt="" draggable="false" src="${u}">`).join('')}</span><div class="tw-bub"></div>`;
     ln.box.appendChild(el);
-    ws.push({ el, ix, size, sp: ln.U * .11, lo: ln.x0 + size * .4, hi: ln.x1 - size * .4, lane: ln.r, key: ANIMALS[ix].key, img: el.querySelector('img'), bub: el.querySelector('.tw-bub'), fr: WALK[ANIMALS[ix].key], x: ln.x0 + (W / (ln.kinds.length + 1)) * (n + 1) + (Math.random() - .5) * W * .2, dir: Math.random() < .5 ? 1 : -1, st: 'walk', t: 2 + Math.random() * 4, ph: Math.random() * 4, cur: -1, mate: null, talks: 0 });
+    ws.push({ el, ix, size, sp: ln.U * .11, lo: ln.x0 + size * .4, hi: ln.x1 - size * .4, lane: ln.r, key: ANIMALS[ix].key, img: el.querySelector('.tw-f'), frs: [...el.querySelectorAll('.tw-f img')], bub: el.querySelector('.tw-bub'), fr: WALK[ANIMALS[ix].key], x: ln.x0 + (W / (ln.kinds.length + 1)) * (n + 1) + (Math.random() - .5) * W * .2, dir: Math.random() < .5 ? 1 : -1, st: 'walk', t: 2 + Math.random() * 4, ph: Math.random() * 4, cur: -1, mate: null, talks: 0 });
   }));
   const box = lanes[0] && lanes[0].box;
   if (!box) return;
-  const setFrame = (w, f) => { if (w.cur !== f) { w.cur = f; w.img.src = w.fr[f]; } };
+  const setFrame = (w, f) => { if (w.cur !== f) { w.frs[w.cur]?.classList.remove('on'); w.cur = f; w.frs[f]?.classList.add('on'); } };
   const endChat = w => { for (const a of [w, w.mate].filter(Boolean)) { a.bub.classList.remove('on', 'long'); a.st = 'walk'; a.t = 2 + Math.random() * 3; a.speaker = undefined; a.mate = null; } };
   ws.forEach(w => w.el.addEventListener('click', ev => {
     ev.stopPropagation();
