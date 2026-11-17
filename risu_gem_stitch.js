@@ -1,13 +1,13 @@
 //@name risu_gem_stitch
 //@display-name 보석 십자수
 //@api 3.0
-//@version 1.0.0
+//@version 1.0.1
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/risu_gem_stitch.js
 /*
  * 채팅 중 가볍게 하는 보석 십자수 정리 퍼즐 (Jewel Coloring 스타일). 도안은 계속 추가, 단계별 자동 저장.
  * 처음엔 모든 보석이 엉뚱한 자리. 보석을 눌러 이어진 같은 색을 고르고 보관함을 누르면 한꺼번에 빠져서
  * 보관함에 들어갑니다(단계별 24·36·48칸, 최대 60칸, 한 색을 다 채울 때마다 한 줄 해금). 두 손가락으로 확대. 고른 블록·보관함 블록은 빈 칸을 눌러 직접 채웁니다.
- * 햄버거 메뉴(💎) 또는 설정에서 실행. 외부 통신·채팅 열람 없음.
+ * 채팅 입력창 메뉴(💎) 또는 설정에서 실행. 외부 통신·채팅 열람 없음.
  */
 (()=>{'use strict';
 // GEM_STITCH_OWNER
@@ -380,7 +380,7 @@ header button{width:30px;height:30px;border-radius:10px;background:#fff;color:#8
  const onKey=e=>{if(!visible||e.key!=='Escape')return;if(!$('col').hidden)$('col').hidden=true;else if(selG||selT>=0)setSel(-1);else if($('menu').hidden)showMenu();else void close();};document.addEventListener('keydown',onKey);
  const ro=new ResizeObserver(()=>{layout();drawMeta();drawLogo();});ro.observe($('stage'));ro.observe($('metaCv'));const onResize=()=>layout();window.addEventListener('resize',onResize);const onHide=()=>void flush();window.addEventListener('pagehide',onHide);
  loadStage(data.cur);const parts=[];
- try{parts.push(await api.registerButton({name:'보석 십자수',icon:'💎',iconType:'html',location:'hamburger',id:'gem-stitch-menu'},open));}catch(e){console.warn('[보석 십자수] 버튼',e);}
+ try{parts.push(await api.registerButton({name:'보석 십자수',icon:'💎',iconType:'html',location:'chat',id:'gem-stitch-menu'},open));}catch(e){console.warn('[보석 십자수] 버튼',e);}
  try{parts.push(await api.registerSetting('보석 십자수',open,'💎','html','gem-stitch-settings'));}catch(e){console.warn('[보석 십자수] 설정',e);}
  try{await api.onUnload(async()=>{disposed=true;visible=false;cancelAnimationFrame(raf);ro.disconnect();stopDrag();document.removeEventListener('keydown',onKey);window.removeEventListener('resize',onResize);window.removeEventListener('pagehide',onHide);await flush();await popup.destroy();for(const p of parts)if(p?.id)try{await api.unregisterUIPart(p.id);}catch(_){}});}catch(_){}
  if(window.__GEM_TEST__)window.__GEM_TEST__={open,get S(){return S},get st(){return st},get view(){return view},get data(){return data},get dbg(){return{cs,ox,oy,cs0,ox0,oy0,raf,boardDirty,selG:selG&&[...selG],selI,selT,dep:[...departing],land:[...landing]}},loadStage,pull};
