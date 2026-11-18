@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.15.4
+//@version 2.16.0
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -738,7 +738,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill };
 })();
-const VER = '2.15.4';
+const VER = '2.16.0';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill } = ART;
@@ -1144,13 +1144,19 @@ function newState() {
     board, rows: START_ROWS, chains: ['bakery', 'coffee'], orders: [],
     disc: Object.fromEntries(CHAIN_KEYS.map(c => [c, c === 'bakery' || c === 'coffee' ? [1] : []])),
     settings: { chatE: 3, sfx: 2, story: true }, story: { intro: false, seen: {} }, giftDay: '', shop: { day: '', buys: 0 },
-    stats: { merges: 0, orders: 0, made: 0 }, pendingGens: [], pendingItems: [], chatBonus: 0, snow: 0, ev: null, onEv: false, evTab: false, coll: {}, pokes: { d: '', l: [] }, seenVer: '', street: {}, stBeat: { 1: 0, 2: 0, 3: 0 }, spin: { d: '' }, tools: { cut: 0, up: 0 }, tbuy: { d: '', cut: 0, up: 0 }, store: [], storeN: 3, nextId: 1,
+    stats: { merges: 0, orders: 0, made: 0 }, pendingGens: [], pendingItems: [], gdisc: {}, chatBonus: 0, snow: 0, ev: null, onEv: false, evTab: false, coll: {}, pokes: { d: '', l: [] }, seenVer: '', street: {}, stBeat: { 1: 0, 2: 0, 3: 0 }, spin: { d: '' }, tools: { cut: 0, up: 0 }, tbuy: { d: '', cut: 0, up: 0 }, store: [], storeN: 3, nextId: 1,
     stars: 0, decor: Object.fromEntries(ALL_SPOTS.map(d => [d.k, 0])), areaDone: {},
   };
   while (st.orders.length < 3) st.orders.push(genOrder(st));
   return st;
 }
 
+function scanGens(s) {
+  if (!s.gdisc) s.gdisc = {};
+  const see = (c, l) => { if (CHAINS[c] && l > (s.gdisc[c] || 0)) s.gdisc[c] = l; };
+  for (const c of s.chains || []) see(c, 1);
+  for (const it of [...(s.board || []), ...(s.store || []), ...(s.pendingItems || []), ...((s.ev && s.ev.board) || [])]) if (it && it.g) see(it.g, Number.isInteger(it.gl) ? it.gl : 1);
+}
 function validItem(it) {
   if (!it || typeof it !== 'object') return null;
   if (it.g && CHAINS[it.g]) return Number.isInteger(it.gl) && it.gl > 1 ? { g: it.g, gl: Math.min(GEN_MAX, it.gl) } : { g: it.g };
@@ -1186,6 +1192,7 @@ function sanitize(o) {
   if (Array.isArray(o.chains)) s.chains = o.chains.filter(c => CHAINS[c]);
   if (!s.chains.length) s.chains = ['bakery', 'coffee'];
   if (o.disc && typeof o.disc === 'object') for (const c of CHAIN_KEYS) s.disc[c] = Array.isArray(o.disc[c]) ? o.disc[c].filter(n => n >= 1 && n <= 7) : [];
+  if (o.gdisc && typeof o.gdisc === 'object') for (const c of CHAIN_KEYS) { const v = Math.floor(+o.gdisc[c] || 0); if (v > 0) s.gdisc[c] = Math.min(5, v); }
   if (o.decor && typeof o.decor === 'object') for (const d of ALL_SPOTS) s.decor[d.k] = Math.min(2, Math.max(0, Math.floor(+o.decor[d.k] || 0)));
   if (o.areaDone && typeof o.areaDone === 'object') for (const a of AREAS) if (o.areaDone[a.k]) s.areaDone[a.k] = true;
   if (o.cafeDone) s.areaDone.cafe = true;
@@ -1212,6 +1219,7 @@ function sanitize(o) {
   if (Array.isArray(o.pendingGens)) s.pendingGens = o.pendingGens.filter(c => CHAINS[c]);
   if (Array.isArray(o.pendingItems)) s.pendingItems = o.pendingItems.map(validItem).filter(Boolean);
   for (const a of AREAS) if (a.gen && s.areaDone[a.k] && !s.chains.includes(a.gen)) { s.chains.push(a.gen); if (!s.pendingGens.includes(a.gen)) s.pendingGens.push(a.gen); }
+  scanGens(s);
   s.orders = Array.isArray(o.orders) ? o.orders.filter(od => od && Array.isArray(od.req) && od.req.length && od.req.every(r => CHAINS[r.c] && r.l >= 1 && r.l <= 7)).slice(0, 3) : [];
   while (s.orders.length < 3) s.orders.push(genOrder(s));
   if (o.ev && Array.isArray(o.ev.board)) {
@@ -1702,7 +1710,7 @@ function drop(from, to) {
   const A = S.board[from], B = S.board[to];
   if (!B) { S.board[to] = A; S.board[from] = null; fx.push({ t: 'land', i: to }); sfx('drop'); }
   else if (A.g && B.g && A.g === B.g && glOf(A) === glOf(B) && glOf(A) < GEN_MAX) {
-    S.board[to] = { g: A.g, gl: glOf(A) + 1 }; S.board[from] = null;
+    S.board[to] = { g: A.g, gl: glOf(A) + 1 }; S.board[from] = null; if ((S.gdisc[A.g] || 0) < glOf(A) + 1) S.gdisc[A.g] = glOf(A) + 1;
     S.stats.merges++;
     fx.push({ t: 'merge', i: to });
     sfx('levelup');
@@ -1927,6 +1935,7 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 .mc-dex{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .mc-dex div{aspect-ratio:1;background:#fbe9d4;border-radius:9px;padding:2px}
 .mc-dex .un img{filter:brightness(0);opacity:.16}
+.mc-dexgl{font-size:11px;color:#a08070;margin:5px 0 3px 2px}.mc-dexg div{background:#f3e3f0}
 .mc-seg{display:flex;gap:4px;flex-wrap:wrap}
 .mc-seg .mc-btn{padding:4px 10px;font-size:14px}
 .mc-seg .on{background:#ff8fa3}
@@ -2727,6 +2736,7 @@ function openShop(fromEmpty) {
   });
 }
 function openDex() {
+  scanGens(S);
   const KEYS = CHAIN_KEYS.filter(c => c !== 'xmas' || S.disc.xmas.length);
   const total = KEYS.length * 7;
   const found = KEYS.reduce((s, c) => s + S.disc[c].length, 0);
@@ -2736,7 +2746,7 @@ function openDex() {
       const ch = CHAINS[c], open = S.chains.includes(c) || MC().includes(c) || S.pendingGens.includes(c) || c === "xmas";
       const lvU = Object.keys(UNLOCKS).find(k => UNLOCKS[k] === c);
       return `<div class="mc-sec"><h4>${esc(ch.name)} <span class="mc-sub">· ${esc(ch.gen)}${open ? '' : lvU ? ` · Lv.${lvU}에 열려요` : (a => a ? ` · ${a.name} 완성하면 열려요` : '')(AREAS.find(a => a.gen === c))}</span></h4>
-        <div class="mc-dex">${ch.items.map((nm, k) => { const has = S.disc[c].includes(k + 1); return `<div class="${has ? '' : 'un'}" title="${has ? esc(nm) : '???'}">${iconItem(c, k + 1)}</div>`; }).join('')}</div></div>`;
+        <div class="mc-dex">${ch.items.map((nm, k) => { const has = S.disc[c].includes(k + 1); return `<div class="${has ? '' : 'un'}" title="${has ? esc(nm) : '???'}">${iconItem(c, k + 1)}</div>`; }).join('')}</div>${hasGenArt(c) ? `<div class="mc-dexgl">생산기</div><div class="mc-dex mc-dexg">${[1, 2, 3, 4, 5].map(l => { const has = (S.gdisc[c] || 0) >= l; return `<div class="${has ? '' : 'un'}" title="${has ? esc(genName(c, l)) + ' Lv.' + l : '???'}">${iconGen(c, l)}</div>`; }).join('')}</div>` : ''}</div>`;
     }).join('')}</div>`, m => m.querySelector('.mc-card').classList.add('mc-dexcard'));
 }
 function openSettings() {
