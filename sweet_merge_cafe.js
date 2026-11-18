@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.19.4
+//@version 2.19.5
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -744,7 +744,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill };
 })();
-const VER = '2.19.4';
+const VER = '2.19.5';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill } = ART;
@@ -1281,8 +1281,8 @@ const curOf = a => a.cur === 'snow' ? 'snow' : 'stars';
 const MC = () => S.onEv && S.ev ? S.ev.chains : S.chains;
 const maxE = () => MAX_E + 10 * D('terrace') + (done('flower') ? 20 : 0) + (done('chestnut') ? 20 : 0) + (done('hotteok') ? 20 : 0) + (APP ? 10 * D('lamp') : 0);
 const regenMs = () => Math.round((REGEN_MS - 10000 * D('planter')) * (done('bath') ? .8 : 1) * (done('camp') ? .9 : 1) * (done('cocoa') ? .9 : 1));
-// 에너지 100을 50코인부터 팔고, 하루 안에서 살 때마다 두 배 (50 → 100 → 200 → 400 …)
-const energyPrice = n => Math.round(50 * 2 ** n * (1 - 0.1 * D('wall')));
+// 에너지 100을 50코인부터 팔고, 하루 안에서 살 때마다 두 배 (50 → 100 → … → 6400, 8번째부터는 그대로)
+const energyPrice = n => Math.round(50 * 2 ** Math.min(n, 7) * (1 - 0.1 * D('wall')));
 // 행운 뽑기: 코인을 쓰는 곳. 값은 레벨 비례, 횟수 제한 없음
 const OVR_DRAW = (WHEEL && WHEEL.draw) || null;
 const ALBUM_ICON = () => (WHEEL && WHEEL.album) ? `<img src="${WHEEL.album}" alt="" draggable="false">` : `<svg viewBox="0 0 48 48" stroke="#5b3a32" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="8" y="7" width="32" height="35" rx="5" fill="#ff9db0"/><path d="M14 7v35" fill="none"/><rect x="18" y="13" width="17" height="14" rx="3" fill="#fff6ea"/><path d="M20 25l4-5 3 3 2-2 4 4" fill="none" stroke-width="2.2"/><circle cx="30" cy="17.5" r="1.8" fill="#ffd75a" stroke-width="1.6"/><path d="M26.5 35.5c-2-1.6-3.5-2.8-3.5-4.4 0-1.2.9-2 2-2 .7 0 1.2.3 1.5.8.3-.5.8-.8 1.5-.8 1.1 0 2 .8 2 2 0 1.6-1.5 2.8-3.5 4.4z" fill="#fff" stroke-width="2"/></svg>`;
