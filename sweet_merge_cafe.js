@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.20.9
+//@version 2.20.10
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -744,7 +744,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill };
 })();
-const VER = '2.20.9';
+const VER = '2.20.10';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill } = ART;
@@ -2105,7 +2105,7 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 #mc.t2 .mc-ord .go{height:21px;font-size:12px}
 #mc.t3 .mc-info{height:44px;margin:4px 10px 6px}
 #mc.t3 .mc-info .ii{width:32px;height:32px}
-#mc.t3 .mc-info .mc-sub{display:none}
+#mc.t3 .mc-info .mc-sub{-webkit-line-clamp:1}
 .mc-acts{display:flex;flex-direction:column;align-items:stretch;gap:5px;flex-shrink:0}
 .mc-tbs{display:flex;gap:5px}
 .mc-tb{position:relative;flex:1;height:32px;min-width:38px;padding:2px;border-radius:11px;background:#fff7ec;border:2.5px solid #5b3a32;box-shadow:0 2px 0 #5b3a32;cursor:pointer}
@@ -2537,6 +2537,10 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 .c .crw{position:absolute;left:0;bottom:0;width:36%;height:36%;z-index:1;pointer-events:none;filter:drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff) drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff)}
 .c .crw svg{width:100%;height:100%;display:block}
 
+/* short screens: one line, item description only (no level text) */
+#mc.t1 .mc-info .lvp,#mc.t2 .mc-info .lvp,#mc.t3 .mc-info .lvp{display:none}
+#mc.t3 .mc-info .tx>b:first-child{font-size:14px;line-height:1.2}
+
 `;
 
 function buildUI() {
@@ -2917,7 +2921,7 @@ function renderInfo0() {
   const mxl = maxLvOf(it.c), next = it.l < mxl ? (S.disc[it.c].includes(it.l + 1) ? ch.items[it.l] : '???') : null;
   const ds = (ITEM_DESC[it.c] || [])[it.l - 1];
   box.innerHTML = `<div class="ii evo" data-act="evo" title="머지 단계 보기">${iconItem(it.c, it.l)}<span class="q">?</span></div><div class="tx"><b>${esc(ch.items[it.l - 1])}</b>
-    <div class="mc-sub">${esc(ch.name)} Lv.${it.l}/${mxl} · ${ds ? esc(ds) : next ? `같은 것 2개 → ${esc(next)}` : '최고 단계예요 ✨'}</div></div>
+    <div class="mc-sub"><span class="lvp">${esc(ch.name)} Lv.${it.l}/${mxl} · </span>${ds ? esc(ds) : next ? `같은 것 2개 → ${esc(next)}` : '최고 단계예요 ✨'}</div></div>
     <div class="mc-sellw"><span class="sl">판매</span><button class="mc-sellb" data-act="sell" title="판매"><i>${UI.coin}</i><b>+${sellPrice(it.l)}</b></button></div>`;
 }
 
