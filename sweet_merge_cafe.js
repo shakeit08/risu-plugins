@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.20.8
+//@version 2.20.9
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -744,7 +744,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill };
 })();
-const VER = '2.20.8';
+const VER = '2.20.9';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill } = ART;
@@ -3074,7 +3074,7 @@ function toast(html, opt = {}) {
 const NOTES = [
   ['2.20.0', [
     '주방 화면을 새로 정리했어요. 위쪽 줄에 레벨·에너지·코인·도감·상점을 모으고, 아래쪽에 보관함·아이템 설명·마을 버튼을 두었어요.',
-    '주문표가 최대 4장까지 들어오고, 옆으로 밀거나 아래 막대를 끌어서 넘겨 볼 수 있어요.',
+    '주문표를 옆으로 밀거나 아래 막대를 끌어서 넘겨 볼 수 있어요.',
     '주문을 다 채우면 주문표에 전달하기 도장이 찍혀요. 주문표를 누르면 전달해요.',
     '주문표의 주민 얼굴이 커지고, 보상은 얼굴 옆에, 주문 메뉴는 얼굴 아래에 보여요. 레벨 4부터는 메뉴 3개를 주문해요.',
     '퍼즐판이 한 줄 늘어 9줄이 됐어요. 9번째 줄은 1000코인으로 열어요.',
