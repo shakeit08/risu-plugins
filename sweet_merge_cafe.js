@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.21.12
+//@version 2.21.14
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -748,7 +748,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG };
 })();
-const VER = '2.21.12';
+const VER = '2.21.14';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG } = ART;
@@ -1453,7 +1453,7 @@ function newState() {
     board, rows: START_ROWS, chains: ['bakery', 'coffee'], orders: [],
     disc: Object.fromEntries(CHAIN_KEYS.map(c => [c, c === 'bakery' || c === 'coffee' ? [1] : []])),
     settings: { chatE: 3, sfx: 2, story: true }, story: { intro: false, seen: {} }, giftDay: '', shop: { day: '', buys: 0 },
-    stats: { merges: 0, orders: 0, made: 0 }, pendingGens: [], pendingItems: [], gdisc: {}, chatBonus: 0, snow: 0, ev: null, onEv: false, evTab: false, coll: {}, pokes: { d: '', l: [] }, seenVer: '', street: {}, stBeat: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }, spin: { d: '' }, tools: { cut: 0, up: 0 }, tbuy: { d: '', cut: 0, up: 0 }, store: [], storeN: 3, nextId: 1,
+    stats: { merges: 0, orders: 0, made: 0 }, pendingGens: [], pendingItems: [], gdisc: {}, chatBonus: 0, snow: 0, ev: null, onEv: false, evTab: false, coll: {}, pokes: { d: '', l: [] }, seenVer: '', street: {}, stBeat: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }, spin: { d: '' }, tools: { cut: 0, up: 0 }, tbuy: { d: '', cut: 0, up: 0 }, store: [], storeN: STORE_START, nextId: 1,
     stars: 0, decor: Object.fromEntries(ALL_SPOTS.map(d => [d.k, 0])), areaDone: {},
   };
   while (st.orders.length < 3) st.orders.push(genOrder(st));
@@ -1519,7 +1519,7 @@ function sanitize(o) {
   if (typeof o.giftDay === 'string') s.giftDay = o.giftDay;
   if (o.shop && typeof o.shop.day === 'string') s.shop = { day: o.shop.day, buys: +o.shop.buys || 0 };
   if (o.tools && typeof o.tools === 'object') for (const k of ['cut', 'up']) s.tools[k] = Math.max(0, Math.min(999, Math.floor(+o.tools[k] || 0)));
-  if (Number.isInteger(o.storeN)) s.storeN = Math.max(3, Math.min(STORE_MAX, o.storeN));
+  if (Number.isInteger(o.storeN)) s.storeN = Math.max(STORE_START, Math.min(STORE_MAX, o.storeN));
   if (Array.isArray(o.store)) s.store = Array.from({ length: s.storeN }, (_, k) => { const v = validItem(o.store[k]); return v || null; });
   for (const k of ['cut', 'up']) if (s.tools[k] > 0) { const n = s.tools[k]; s.tools[k] = 0; const h = s.store.find(x => x && x.tool === k); if (h) h.n = (h.n || 1) + n; else { const e = s.store.findIndex(x => !x), it = n > 1 ? { tool: k, n } : { tool: k }; if (e >= 0) s.store[e] = it; else s.pendingItems.push(it); } }
   if (o.spin && typeof o.spin.d === 'string') s.spin = { d: o.spin.d };
@@ -1750,7 +1750,8 @@ function rollItem(maxL, chains = MC()) {
   if (maxL >= 4 && r < .06) l = 4;
   return { c, l };
 }
-const STORE_MAX = 10, STORE_COST = [0, 0, 0, 150, 250, 400, 600, 850, 1100, 1400];
+// 보관함: 처음 10칸, 코인으로 50칸까지 (칸마다 50코인씩 비싸짐)
+const STORE_MAX = 50, STORE_START = 10, STORE_COST = n => n < STORE_START ? 0 : 200 + (n - STORE_START) * 50;
 const STB = 1000, TLB = 2000, TK = ['cut', 'up'];
 const getIt = i => i >= TLB ? ((S.tools[TK[i - TLB]] || 0) > 0 ? { tool: TK[i - TLB] } : null) : i >= STB ? (S.store[i - STB] || null) : S.board[i];
 const setIt = (i, v) => { if (i >= STB && i < TLB) S.store[i - STB] = v; else if (i < STB) S.board[i] = v; };
@@ -1870,7 +1871,7 @@ function openBox() {
   const body = m.querySelector('.mc-boxbody');
   const draw = () => {
     const used = S.store.filter(Boolean).length;
-    body.innerHTML = `<div class="mc-sec"><h4>보관 칸 <span class="mc-sub">${used}/${S.storeN} · 누르면 판으로 꺼내요</span></h4><div class="mc-bgrid">${Array.from({ length: S.storeN }, (_, k) => { const it = S.store[k]; return `<button class="bc ${it ? '' : 'em'}" ${it ? `data-out="${k}"` : ''}>${it ? (it.tool ? `<div class="it">${toolIcon(it.tool)}</div>${tBadge(it)}` : it.b ? `<div class="it">${iconBag(it.b)}</div>` : it.g ? `<div class="it">${iconGen(it.g, it.gl || 1)}</div>` : `<div class="it">${iconItem(it.c, it.l)}</div>${it.l >= 2 ? `<span class="lvb">${it.l}</span>` : ''}`) : ''}</button>`; }).join('')}${S.storeN < STORE_MAX ? `<button class="bc add" data-more><b>+</b><span><i>${UI.coin}</i>${STORE_COST[S.storeN]}</span></button>` : ''}</div>
+    body.innerHTML = `<div class="mc-sec"><h4>보관 칸 <span class="mc-sub">${used}/${S.storeN} · 누르면 판으로 꺼내요</span></h4><div class="mc-bgrid">${Array.from({ length: S.storeN }, (_, k) => { const it = S.store[k]; return `<button class="bc ${it ? '' : 'em'}" ${it ? `data-out="${k}"` : ''}>${it ? (it.tool ? `<div class="it">${toolIcon(it.tool)}</div>${tBadge(it)}` : it.b ? `<div class="it">${iconBag(it.b)}</div>` : it.g ? `<div class="it">${iconGen(it.g, it.gl || 1)}</div>` : `<div class="it">${iconItem(it.c, it.l)}</div>${it.l >= 2 ? `<span class="lvb">${it.l}</span>` : ''}`) : ''}</button>`; }).join('')}${S.storeN < STORE_MAX ? `<button class="bc add" data-more><b>+</b><span><i>${UI.coin}</i>${STORE_COST(S.storeN)}</span></button>` : ''}</div>
       <div class="mc-sub" style="margin-top:8px">판 위 재료·생산기·보따리·가위·스프링클을 위쪽 보관함 버튼으로 끌어다 놓으면 넣을 수 있어요. 가위·스프링클은 판으로 꺼낸 뒤 재료에 끌어다 놓으면 써져요.</div></div>`;
   };
   draw();
@@ -1884,11 +1885,12 @@ function openBox() {
       sfx('drop'); draw(); renderAll(); save();
       return;
     }
-    if (ev.target.closest('[data-more]')) { sfx('ui'); await buyStoreSlot(); draw(); }
+    // 늘리기 확인 창이 보관함 창을 닫으니, 끝나면 보관함을 다시 열어 줌
+    if (ev.target.closest('[data-more]')) { sfx('ui'); await buyStoreSlot(); if (m.isConnected) draw(); else openBox(); }
   });
 }
 async function buyStoreSlot() {
-  const n = S.storeN, cost = STORE_COST[n];
+  const n = S.storeN, cost = STORE_COST(n);
   if (!cost || n >= STORE_MAX) return;
   if (S.coins < cost) { sfx('error'); toast(`코인이 부족해요 (${cost} 필요)`); return; }
   if (!(await confirmBox('보관함 칸을 하나 늘릴까요?', `${cost} 코인으로 늘리기`))) return;
@@ -1905,7 +1907,7 @@ function renderStore() {
     const it = S.store[k];
     h += `<div class="c sc" data-i="${STB + k}">${it ? `<div class="it">${iconItem(it.c, it.l)}</div>${it.l >= 2 ? `<span class="lvb">${it.l}</span>` : ''}` : ''}</div>`;
   }
-  if (S.storeN < STORE_MAX) h += `<button class="mc-stbuy" data-act="stbuy"><b>+</b><span><i>${UI.coin}</i>${STORE_COST[S.storeN]}</span></button>`;
+  if (S.storeN < STORE_MAX) h += `<button class="mc-stbuy" data-act="stbuy"><b>+</b><span><i>${UI.coin}</i>${STORE_COST(S.storeN)}</span></button>`;
   h += '</div>';
   box.innerHTML = h;
   box.querySelector('.mc-sts').scrollLeft = sx;
