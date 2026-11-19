@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.21.20
+//@version 2.21.22
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -756,7 +756,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest };
 })();
-const VER = '2.21.20';
+const VER = '2.21.22';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest } = ART;
@@ -2920,7 +2920,7 @@ function bindOrderBar() {
 function renderOrders() {
   const counts = boardCounts();
   const nowReady = new Set(S.orders.filter(od => orderReady(od, counts)).map(od => od.id));
-  $('.mc-orders').innerHTML = S.orders.map(od => {
+  const oh = S.orders.map(od => {
     const ready = orderReady(od, counts);
     const used = {};
     const reqs = od.req.map(r => {
@@ -2933,6 +2933,8 @@ function renderOrders() {
     const go = ready ? `<span class="stamp">전달하기</span>` : '';
     return `<div class="mc-ord ${ready ? 'ready' : ''}" data-id="${od.id}" ${ready ? `data-act="order"` : ''} title="${esc(ANIMALS[od.a].name)} 손님"><div class="hd"><div class="fc">${iconAnimal(od.a, ready)}</div><div class="rws">${rw}</div></div><div class="row">${reqs}</div>${go}</div>`;
   }).join('');
+  // 주문표가 그대로면 다시 그리지 않음
+  { const O = $('.mc-orders'); if (O.__h !== oh || !O.firstChild === !!oh) { O.innerHTML = oh; O.__h = oh; } }
   for (const f of fx.filter(f => f.t === 'order')) {
     const el = $(`.mc-ord[data-id="${f.id}"]`);
     el?.animate([{ transform: 'scale(.5) rotate(-4deg)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 380, easing: 'cubic-bezier(.3,1.6,.5,1)' });
@@ -2946,11 +2948,13 @@ function renderOrders() {
 // 최대 단계 왕관 (생산기 Lv8, 보따리 3단계)
 const CROWN = '<svg viewBox="0 0 24 24" stroke-linejoin="round" stroke-linecap="round"><path d="M3.5 8.5 L8 12.5 L12 5.5 L16 12.5 L20.5 8.5 L18.8 18.5 H5.2 Z" fill="#ffd75a" stroke="#5b3a32" stroke-width="2.2"/><path d="M6.2 15.6 H17.8" stroke="#f2a63a" stroke-width="1.6"/><circle cx="3.5" cy="8" r="1.7" fill="#ff8fa3" stroke="#5b3a32" stroke-width="1.4"/><circle cx="12" cy="4.8" r="1.7" fill="#ff8fa3" stroke="#5b3a32" stroke-width="1.4"/><circle cx="20.5" cy="8" r="1.7" fill="#ff8fa3" stroke="#5b3a32" stroke-width="1.4"/></svg>';
 const crownTag = '<span class="crw">' + CROWN + '</span>';
+let boardPrev = { el: null, cells: [], unl: '' };
 function renderBoard() {
   const counts = boardCounts();
   const wanted = new Set();
   S.orders.forEach(od => od.req.forEach(r => wanted.add(r.c + ':' + r.l)));
   const selIt = S.board[sel];
+  const cells = [];
   let h = '';
   for (let i = 0; i < COLS * ROWS; i++) {
     const [r, c] = rc(i);
@@ -2971,13 +2975,21 @@ function renderBoard() {
       // (merge-mate hint removed)
     }
     if (i === sel && it) cls += ' sel';
-    h += `<div class="${cls}" data-i="${i}" style="grid-row:${r + 1};grid-column:${c + 1}">${inner}</div>`;
+    cells.push(`<div class="${cls}" data-i="${i}" style="grid-row:${r + 1};grid-column:${c + 1}">${inner}</div>`);
   }
   if (S.rows < ROWS) {
-    h += `<button class="mc-btn mc-unl" data-act="unlock" style="grid-row:${S.rows + 1}"><i>${UI.lock}</i> 한 줄 열기 <i>${UI.coin}</i>${ROW_COST[S.rows]}</button>`;
+    h = `<button class="mc-btn mc-unl" data-act="unlock" style="grid-row:${S.rows + 1}"><i>${UI.lock}</i> 한 줄 열기 <i>${UI.coin}</i>${ROW_COST[S.rows]}</button>`;
   }
-  $('.mc-board').innerHTML = h;
-  document.querySelectorAll('.mc-board .c.gen .it img').forEach(genCenter);
+  // 바뀐 칸만 새로 그림 (판 전체를 매번 다시 그리면 그림·그림자 효과를 63칸 모두 다시 계산해서 폰에서 버벅임)
+  const B = $('.mc-board'), kids = B.children, P = boardPrev;
+  if (P.el === B && P.unl === h && P.cells.length === cells.length && kids.length === cells.length + (h ? 1 : 0)) {
+    const t = document.createElement('template');
+    cells.forEach((s, i) => { if (s !== P.cells[i]) { t.innerHTML = s; const n = t.content.firstElementChild; kids[i].replaceWith(n); n.querySelectorAll('.it img').forEach(im => n.classList.contains('gen') && genCenter(im)); } });
+  } else {
+    B.innerHTML = cells.join('') + h;
+    B.querySelectorAll('.c.gen .it img').forEach(genCenter);
+  }
+  boardPrev = { el: B, cells, unl: h };
   runBoardFx();
 }
 // 생산기 그림은 아래쪽에 붙어 있고 위 여백이 제각각이라, 그림마다 보이는 부분을 칸 한가운데로 맞춤
