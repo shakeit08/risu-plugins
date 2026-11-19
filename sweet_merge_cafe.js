@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.20.0
+//@version 2.20.2
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -744,7 +744,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill };
 })();
-const VER = '2.20.0';
+const VER = '2.20.2';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill } = ART;
@@ -2478,14 +2478,16 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 
 /* generators: bigger, thicker outer outline only */
 .mc-board .c.gen .it{inset:-1%}
-.mc-board .c.gen .it img,.mc-board .c.gen .it svg{filter:drop-shadow(1.6px 0 0 #5b3a32) drop-shadow(-1.6px 0 0 #5b3a32) drop-shadow(0 1.6px 0 #5b3a32) drop-shadow(0 -1.6px 0 #5b3a32) drop-shadow(0 2.5px 1.5px rgba(91,58,50,.3))}
+.mc-board .c.gen .it img,.mc-board .c.gen .it svg{filter:drop-shadow(.8px 0 0 #5b3a32) drop-shadow(-.8px 0 0 #5b3a32) drop-shadow(0 .8px 0 #5b3a32) drop-shadow(0 -.8px 0 #5b3a32) drop-shadow(0 2.5px 1.5px rgba(91,58,50,.3))}
 
 /* box / town buttons: illustration icons with sticker outline */
 .mc-bot .mc-fab .pic{width:42px!important;height:36px!important;margin-bottom:3px}
 .mc-bot .mc-fab .pic img{filter:drop-shadow(1.5px 0 0 #fff) drop-shadow(-1.5px 0 0 #fff) drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff) drop-shadow(1.2px 0 0 #5b3a32) drop-shadow(-1.2px 0 0 #5b3a32) drop-shadow(0 1.2px 0 #5b3a32) drop-shadow(0 -1.2px 0 #5b3a32) drop-shadow(0 2px 0 rgba(91,58,50,.3))}
 #mc.t2 .mc-bot .mc-fab .pic{width:36px!important;height:32px!important}
 
-/* item info: tap image -> evolution popup */
+/* item info: tap image -> merge steps popup */
+.mc-evocard,.mc-dexcard{position:relative}
+.mc-evocard .mc-xbtn,.mc-dexcard .mc-xbtn{top:10px;right:10px}
 .mc-info .ii.evo{position:relative;cursor:pointer}
 .mc-info .mc-sub{word-break:keep-all}
 .mc-info .ii.evo .q{position:absolute;right:-4px;top:-4px;width:17px;height:17px;border-radius:50%;background:#ff8fa3;color:#fff;border:2px solid #5b3a32;font-size:11px;line-height:13px;text-align:center}
@@ -2892,7 +2894,7 @@ function renderInfo0() {
   const ch = CHAINS[it.c];
   const mxl = maxLvOf(it.c), next = it.l < mxl ? (S.disc[it.c].includes(it.l + 1) ? ch.items[it.l] : '???') : null;
   const ds = (ITEM_DESC[it.c] || [])[it.l - 1];
-  box.innerHTML = `<div class="ii evo" data-act="evo" title="진화 단계 보기">${iconItem(it.c, it.l)}<span class="q">?</span></div><div class="tx"><b>${esc(ch.items[it.l - 1])}</b>
+  box.innerHTML = `<div class="ii evo" data-act="evo" title="머지 단계 보기">${iconItem(it.c, it.l)}<span class="q">?</span></div><div class="tx"><b>${esc(ch.items[it.l - 1])}</b>
     <div class="mc-sub">${esc(ch.name)} Lv.${it.l}/${mxl} · ${ds ? esc(ds) : next ? `같은 것 2개 → ${esc(next)}` : '최고 단계예요 ✨'}</div></div>
     <div class="mc-sellw"><span class="sl">판매</span><button class="mc-sellb" data-act="sell" title="판매"><i>${UI.coin}</i><b>+${sellPrice(it.l)}</b></button></div>`;
 }
@@ -3276,9 +3278,9 @@ function openEvo(c, cur) {
     const l = k + 1, has = S.disc[c].includes(l), lock = l > mx;
     return `<div class="ev-t ${has ? '' : 'un'} ${lock ? 'lk' : ''} ${l === cur ? 'cur' : ''}"><span class="lv">${l}</span><div class="ic">${lock ? UI.lock : iconItem(c, l)}</div><b>${has && !lock ? esc(nm) : '???'}</b></div>`;
   }).join('');
-  modal(`<button class="mc-xbtn" data-x aria-label="닫기">×</button><h3>${esc(ch.name)} 진화 단계</h3>
+  modal(`<button class="mc-xbtn" data-x aria-label="닫기">×</button><h3>${esc(ch.name)} 머지 단계</h3>
     <div class="mc-sub" style="text-align:center;margin-bottom:8px">같은 것 2개를 합치면 다음 단계가 돼요</div>
-    <div class="mc-evo">${tiles}</div>`);
+    <div class="mc-evo">${tiles}</div>`, m => m.querySelector('.mc-card').classList.add('mc-evocard'));
 }
 function openDex() {
   scanGens(S);
