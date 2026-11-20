@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.21.34
+//@version 2.21.39
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -756,7 +756,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest };
 })();
-const VER = '2.21.34';
+const VER = '2.21.39';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest } = ART;
@@ -1460,7 +1460,7 @@ function newState() {
     v: 1, savedAt: 0, level: 1, xp: 0, coins: 30, energy: MAX_E, eTs: Date.now(),
     board, rows: START_ROWS, chains: ['bakery', 'coffee'], orders: [],
     disc: Object.fromEntries(CHAIN_KEYS.map(c => [c, c === 'bakery' || c === 'coffee' ? [1] : []])),
-    settings: { chatE: 3, sfx: 2, story: true }, story: { intro: false, seen: {} }, giftDay: '', shop: { day: '', buys: 0 }, mail: { list: [], got: {}, am: '', pm: '' },
+    settings: { chatE: 3, sfx: 2, story: true }, story: { intro: false, seen: {} }, giftDay: '', shop: { day: '', buys: 0 }, mail: { list: [], got: {}, am: '', pm: '' }, tut: { k: 0, t: 0 },
     stats: { merges: 0, orders: 0, made: 0 }, pendingGens: [], pendingItems: [], gdisc: {}, chatBonus: 0, snow: 0, ev: null, onEv: false, evTab: false, coll: {}, pokes: { d: '', l: [] }, seenVer: '', street: {}, stBeat: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }, spin: { d: '' }, tools: { cut: 0, up: 0 }, tbuy: { d: '', cut: 0, up: 0 }, store: [], storeN: STORE_START, nextId: 1,
     stars: 0, decor: Object.fromEntries(ALL_SPOTS.map(d => [d.k, 0])), areaDone: {},
   };
@@ -1527,6 +1527,7 @@ function sanitize(o) {
   if (o.pokes && typeof o.pokes.d === 'string' && Array.isArray(o.pokes.l)) s.pokes = { d: o.pokes.d, l: o.pokes.l.filter(k => typeof k === 'string') };
   if (o.story && typeof o.story === 'object') { s.story.intro = !!o.story.intro; if (o.story.seen && typeof o.story.seen === 'object') for (const k in STORY) if (o.story.seen[k]) s.story.seen[k] = true; }
   if (typeof o.giftDay === 'string') s.giftDay = o.giftDay;
+  if (o.tut && typeof o.tut === 'object') s.tut = { k: o.tut.k ? 1 : 0, t: o.tut.t ? 1 : 0 };
   if (o.mail && typeof o.mail === 'object') {
     const M = o.mail;
     if (typeof M.am === 'string') s.mail.am = M.am; if (typeof M.pm === 'string') s.mail.pm = M.pm;
@@ -2655,6 +2656,12 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 .tw-mail .lb{position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);font-size:11px;line-height:1;background:#fff;border:2px solid #5b3a32;border-radius:99px;padding:2px 6px 1px;white-space:nowrap;color:#5b3a32}
 .tw-mail .bd{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:99px;background:#ff6f8e;color:#fff;font-size:12px;line-height:20px;text-align:center;border:2px solid #fff}
 .mc-mailcard{max-width:460px!important;width:94%}
+.mc-tut{position:absolute;inset:0;z-index:400;cursor:pointer}
+.tu-hole{position:absolute;border-radius:16px;box-shadow:0 0 0 2000px rgba(40,24,20,.6);border:3px solid #ffd75a;transition:all .25s ease;pointer-events:none}
+.tu-bub{position:absolute;background:#fff;border:3px solid #5b3a32;border-radius:16px;padding:12px 14px 10px;box-shadow:0 4px 0 #5b3a32;color:#5b3a32}
+.tu-bub p{margin:0 0 10px;font-size:15px;line-height:1.45;word-break:keep-all;text-align:left}
+.tu-act{display:flex;align-items:center;gap:8px}.tu-skip{font:inherit;font-size:12.5px;color:#a07a62;background:none;border:0;padding:4px 2px;cursor:pointer;text-decoration:underline}
+.tu-n{flex:1;text-align:center;font-size:12px;color:#a07a62}.tu-go{font-size:14px;padding:7px 16px}
 .mc-mailw{max-height:60vh;overflow:auto;display:flex;flex-direction:column;gap:8px;margin:6px 0 10px;padding:2px}
 .ml-row{display:flex;align-items:center;gap:10px;background:#fffaf2;border:2px solid #e8cba8;border-radius:14px;padding:8px 10px}
 .ml-row.got{opacity:.6}
@@ -3661,6 +3668,7 @@ function openSettings() {
     <div class="mc-sec"><h4>시즌 이벤트</h4>
       <div class="mc-seg"><button class="mc-btn wh ${S.settings.evPreview ? 'on' : ''}" data-evp="1">미리 열기</button><button class="mc-btn wh ${S.settings.evPreview ? '' : 'on'}" data-evp="0">날짜대로</button></div>
       <div class="mc-sub" style="margin-top:4px">크리스마스: 12월 1일~1월 7일</div></div>
+    <div class="mc-sec"><h4>가이드</h4><div class="mc-seg"><button class="mc-btn wh" data-tut>가이드 다시 보기</button></div></div>
     <div class="mc-sec"><h4>업데이트</h4><div class="mc-seg"><button class="mc-btn wh" data-notes>업데이트 내역 보기</button></div><div class="mc-sub" style="margin-top:4px">현재 버전 v${VER}</div></div>
     <div class="mc-sec"><h4>기록</h4>
       <div class="mc-stat"><span>합친 횟수</span><span>${S.stats.merges}</span></div>
@@ -3691,6 +3699,7 @@ function openSettings() {
     m.querySelectorAll('[data-story]').forEach(x => x.classList.toggle('on', x === b));
   });
   m.querySelector('[data-notes]').onclick = () => { m.remove(); openNotes(); };
+  m.querySelector('[data-tut]')?.addEventListener('click', () => { m.remove(); S.tut = { k: 0, t: 0 }; save(); setTimeout(() => runTut($('.mc-town') ? 't' : 'k', true), 300); });
   m.querySelectorAll('[data-ce]').forEach(b => b.onclick = () => {
     S.settings.chatE = +b.dataset.ce; save();
     m.querySelectorAll('[data-ce]').forEach(x => x.classList.toggle('on', x === b));
@@ -3974,7 +3983,7 @@ async function openTownSafe() {
 // ---------- town overview ----------
 function openTown() {
   if ($('.mc-town')) return;
-  checkMail(); fetchDevMail();
+  checkMail(); fetchDevMail(); setTimeout(() => runTut('t'), 1200);
   const v = document.createElement('div');
   v.className = 'mc-town';
   townCh = (AREAS[defaultArea()] && AREAS[defaultArea()].ch) || 1;
@@ -4795,6 +4804,66 @@ function upgradeDecor(k) {
 }
 
 // ---------- story ----------
+// ---------- 처음 하는 사람을 위한 가이드: 버튼 위에 말풍선 ----------
+const TUT = {
+  k: [
+    ['.mc-board .c.gen', '생산기를 톡 누르면 재료가 나와요. 한 번에 ⚡에너지 1을 써요.'],
+    ['.mc-board', '같은 재료 2개를 끌어다 겹치면 다음 단계로 합쳐져요.'],
+    ['.mc-orders .mc-ord', '주민 주문표예요. 필요한 재료를 다 모으면 주문표에 \'전달하기\'가 떠요.'],
+    ['.mc-info', '아이템을 고르면 여기에 설명이 나와요. 그림을 누르면 머지 단계를 볼 수 있어요.'],
+    ['.mc-lv', '내 레벨이에요. 누르면 설정이 열려요. 효과음·데이터 백업·가이드 다시 보기도 여기 있어요.'],
+    ['#mc-en', '에너지는 시간이 지나면 다시 차요. ＋를 누르면 코인으로 살 수 있어요.'],
+    ['.mc-sw', '⚡×3 슈퍼 머지를 켜면 에너지를 더 써서 높은 단계 재료가 나와요.'],
+    ['.mc-boxb', '자리가 모자라면 아이템을 보관함으로 끌어다 놓아 보관해요.'],
+    ['#mc-cafeb', '주문으로 모은 ⭐별로 마을을 꾸며요. 여기를 누르면 마을로 가요!'],
+  ],
+  t: [
+    ['.tw-next', '다음 할 일이에요. 누르면 꾸밀 곳으로 바로 안내해 줘요.'],
+    ['.tw-st', '거리 자리를 누르면 ⭐별로 하나씩 치우고 꾸밀 수 있어요.'],
+    ['.tw-lot', '가게를 누르면 안으로 들어가 꾸밀 수 있어요.'],
+    ['.tw-chs:has(.mc-tab + .mc-tab)', '장을 바꿔 다른 동네를 둘러볼 수 있어요.'],
+    ['[data-tw="spin"]', '하루 한 번 룰렛을 돌려 선물을 받아요.'],
+    ['.tw-mail', '아침·저녁마다 주민들이 편지와 선물을 보내요.'],
+    ['[data-tw="back"]', '주방 버튼을 누르면 다시 퍼즐판으로 돌아가요.'],
+  ],
+};
+let tutOn = false;
+const tutQ = (root, q) => { try { return root.querySelector(q); } catch (_) { return null; } };
+function runTut(kind, force) {
+  if (tutOn || !S || !S.tut || (S.tut[kind] && !force)) return;
+  const panel = $('.mc-panel'); if (!panel) return;
+  // 이야기·창이 떠 있으면 닫힐 때까지 기다림
+  if ($('.mc-story') || $('.mc-modal') || (kind === 'k' && $('.mc-town'))) { setTimeout(() => runTut(kind, force), 700); return; }
+  const steps = TUT[kind].filter(([q]) => { const e = tutQ(panel, q); return e && e.getClientRects().length; });
+  if (!steps.length) return;
+  tutOn = true;
+  const ov = document.createElement('div'); ov.className = 'mc-tut';
+  ov.innerHTML = `<div class="tu-hole"></div><div class="tu-bub"><p></p><div class="tu-act"><button class="tu-skip">건너뛰기</button><span class="tu-n"></span><button class="mc-btn pk tu-go">다음</button></div></div>`;
+  panel.appendChild(ov);
+  const hole = ov.querySelector('.tu-hole'), bub = ov.querySelector('.tu-bub');
+  let k = 0;
+  const end = () => { ov.remove(); tutOn = false; S.tut[kind] = 1; save(); };
+  const show = () => {
+    if (k >= steps.length) return end();
+    const [q, txt] = steps[k], el = tutQ(panel, q);
+    if (!el || !el.getClientRects().length) { k++; return show(); }
+    try { el.scrollIntoView?.({ block: 'nearest', inline: 'nearest' }); } catch (_) { }
+    const P = panel.getBoundingClientRect(), R = el.getBoundingClientRect(), pad = 6;
+    const x = R.left - P.left - pad, y = R.top - P.top - pad, w = R.width + pad * 2, h = R.height + pad * 2;
+    Object.assign(hole.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' });
+    bub.querySelector('p').textContent = txt;
+    bub.querySelector('.tu-n').textContent = `${k + 1} / ${steps.length}`;
+    bub.querySelector('.tu-go').textContent = k === steps.length - 1 ? '알겠어요!' : '다음';
+    // 말풍선은 대상 아래, 자리가 없으면 위
+    const bw = Math.min(300, P.width - 24), below = y + h + 12 + 130 < P.height;
+    bub.style.width = bw + 'px';
+    bub.style.left = Math.max(12, Math.min(P.width - bw - 12, x + w / 2 - bw / 2)) + 'px';
+    bub.style.top = below ? (y + h + 12) + 'px' : ''; bub.style.bottom = below ? '' : (P.height - y + 12) + 'px';
+    bub.classList.toggle('up', !below);
+  };
+  ov.addEventListener('click', ev => { ev.stopPropagation(); if (ev.target.closest('.tu-skip')) return end(); k++; try { show(); } catch (_) { end(); } });
+  try { show(); } catch (_) { end(); }
+}
 // ---------- 우편함: 주민 편지(아침·저녁) · 우체국 소포 · 개발자 편지 ----------
 const MAIL_MAX = 30;
 const MAIL_URLS = ['https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe_mail.json', 'https://cdn.jsdelivr.net/gh/shakeit08/risu-plugins@main/sweet_merge_cafe_mail.json'];
@@ -5057,6 +5126,7 @@ async function openGame() {
       renderAll(); layout(); watchLayout();
       if (S.chatBonus > 0) { toast(`채팅하는 동안 에너지가 찼어요 <span class="mc-mini">${UI.bolt}+${S.chatBonus}</span>`); S.chatBonus = 0; save(); }
       { const nm = checkMail(); if (nm) toast(`우편함에 새 편지가 ${nm}통 왔어요! 마을에서 열어 보세요.`, { icon: MAIL_ICON() }); fetchDevMail(); }
+      setTimeout(() => runTut('k'), 900);
       const evr = checkEvent();
       if (S.evTab && S.ev && !S.onEv) swapEv();
       if (evr) renderAll();
