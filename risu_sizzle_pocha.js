@@ -1,7 +1,7 @@
 //@name risu_sizzle_pocha
 //@display-name 지글지글 포장마차
 //@api 3.0
-//@version 1.8.1
+//@version 1.8.2
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/risu_sizzle_pocha.js
 /*
  * 채팅 중 가볍게 하는 분식 꼬치 정렬 퍼즐 (푸디 시즐 스타일).
@@ -425,7 +425,6 @@ document.body.innerHTML=`<section id="shell"><header><div class="lv" id="hlv">�
 <main id="main">
  <section id="menu" class="scr">
   <div class="cover"></div>
-  <div class="ttl"><b>지글지글<br>포장마차</b></div>
   <div class="mbot">
    <div class="pills"><div class="coinpill"><span class="ic-heart"></span> <b id="mHeart">5/5</b></div><div class="coinpill"><span class="ic-coin"></span> <b id="mCoin">0</b></div></div>
    <button class="big green" id="go">LV 1 시작</button>
