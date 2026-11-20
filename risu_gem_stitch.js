@@ -1,7 +1,7 @@
 //@name risu_gem_stitch
 //@display-name 보석 십자수
 //@api 3.0
-//@version 1.1.4
+//@version 1.1.5
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/risu_gem_stitch.js
 /*
  * 채팅 중 가볍게 하는 보석 십자수 정리 퍼즐 (Jewel Coloring 스타일). 도안은 계속 추가, 단계별 자동 저장.
@@ -261,7 +261,7 @@ header button{width:30px;height:30px;border-radius:10px;background:#fff;color:#8
 
  // ---------- 규칙 ----------
  function loadStage(id){st=STAGES.find(s=>s.id===id)||STAGES[0];st.bg=st.pal.map(c=>{const L=hex(c).reduce((a,v,i)=>a+v*[.299,.587,.114][i],0)/255;return L<.3?mix(c,'#b8b4c8',.2):mix(c,'#a8a4b8',.1);});st.gh=st.pal.map(c=>{const L=hex(c).reduce((a,v,i)=>a+v*[.299,.587,.114][i],0)/255;return L<.3?mix(c,'#ffffff',.12):mix(c,'#2b3040',.3);});shineBig=0;S=restoreRec(st,data.rec[st.id])||fresh(st);
-  hist=[];view={z:1,px:0,py:0};flights.length=0;landing.clear();pend.clear();departing.clear();ghostT.clear();clearTimeout(winT);$('win').hidden=true;sprites.clear();holes=[];selG=null;selI=-1;selT=-1;tip();layout();save();render();}
+  hist=[];view={z:1,px:0,py:0};flights.length=0;landing.clear();pend.clear();departing.clear();ghostT.clear();clearTimeout(winT);$('win').hidden=true;sprites.clear();holes=[];selG=null;selI=-1;selT=-1;tip();layout();save();render();if(st.T.every((t,i)=>t<0||S.board[i]===t)){if(!S.done){S.done=true;data.col=data.col||[];if(!data.col.some(q=>q.lv===data.lv))data.col.push({lv:data.lv,id:st.id});save();}$('winsub').textContent=`단계 ${data.lv}`;$('w-next').textContent='다음 ›';$('win').hidden=false;}}
  // 고를 때도 채울 때와 똑같이 맞닿은(상하좌우+대각선) 같은 색 보석을 한 덩어리로
  function group(i){const T=st.T,B=S.board,c=B[i],W=st.w,out=[i],seen=new Set([i]);for(let q=0;q<out.length;q++){const j=out[q],x=j%W;for(const dy of [-1,0,1])for(const dx of [-1,0,1]){if(!dx&&!dy)continue;if(x+dx<0||x+dx>=W)continue;const n=j+dy*W+dx;if(n<0||n>=T.length||seen.has(n))continue;if(B[n]===c&&T[n]!==c){seen.add(n);out.push(n);}}}return out;}
  function nearest(list,i){let best=-1,bd=1e9;const x=i%st.w,y=Math.floor(i/st.w);for(let k=0;k<list.length;k++){const j=list[k],d=Math.abs(j%st.w-x)+Math.abs(Math.floor(j/st.w)-y);if(d<bd){bd=d;best=k;}}return best<0?-1:list.splice(best,1)[0];}
