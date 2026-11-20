@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.21.42
+//@version 2.21.43
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -756,7 +756,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest };
 })();
-const VER = '2.21.42';
+const VER = '2.21.43';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest } = ART;
@@ -2228,7 +2228,7 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 #mc svg,#mc img{display:block;width:100%;height:100%}
 #mc img{object-fit:contain;pointer-events:none;-webkit-user-drag:none;user-select:none}
 .c .it img,.mc-ghost img{filter:drop-shadow(0 2px 1.5px rgba(91,58,50,.28))}
-.mc-panel{position:relative;touch-action:manipulation;width:min(100vw,460px);height:min(100dvh,880px);background:#fff7ec;border:3px solid #5b3a32;border-radius:24px;box-shadow:0 6px 0 #5b3a32;display:flex;flex-direction:column;overflow:hidden;
+.mc-panel{position:relative;width:min(100vw,460px);height:min(100dvh,880px);background:#fff7ec;border:3px solid #5b3a32;border-radius:24px;box-shadow:0 6px 0 #5b3a32;display:flex;flex-direction:column;overflow:hidden;
  background-image:radial-gradient(circle at 1px 1px,rgba(255,143,163,.18) 1.5px,transparent 1.6px);background-size:16px 16px}
 @media (max-width:480px){.mc-panel{width:100vw;height:100dvh;border:none;border-radius:0;box-shadow:none}}
 @media (min-width:481px) and (max-height:700px){.mc-panel{height:100dvh;border-top:none;border-bottom:none;border-radius:0;box-shadow:none}}
@@ -2266,6 +2266,7 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 .mc-rw i{width:15px;height:15px;display:inline-block}
 .mc-ord .go{width:100%;height:24px;font-size:13px;padding:0}
 .mc-wrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:0 8px}
+.mc-panel>*:not(.mc-town){touch-action:manipulation}
 .mc-board{display:grid;grid-template-columns:repeat(7,var(--cell));grid-template-rows:repeat(9,var(--cell));gap:3px;padding:6px;background:#e7c39f;border:3px solid #5b3a32;border-radius:18px;touch-action:none;position:relative;box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 3px 0 #5b3a32}
 .c{position:relative;border-radius:10px;background:#fcecd9}
 .c.alt{background:#f7dfc5}
