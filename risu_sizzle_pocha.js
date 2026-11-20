@@ -1,7 +1,7 @@
 //@name risu_sizzle_pocha
 //@display-name 지글지글 포장마차
 //@api 3.0
-//@version 1.9.3
+//@version 1.9.4
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/risu_sizzle_pocha.js
 /*
  * 채팅 중 가볍게 하는 분식 꼬치 정렬 퍼즐 (푸디 시즐 스타일).
@@ -445,6 +445,16 @@ html,body,button,input{font-family:"PochaJua","Pretendard","Apple SD Gothic Neo"
 .order .cust{height:104px!important;width:82px!important}
 .order .cu{margin-bottom:4px!important}
 .order .cu img{height:98px!important;width:auto;max-width:none}
+
+/* 손님: 게임판 갈색 위까지 내려서 판 뒤로, 조금 크게 */
+#level .board,#level .railbox{position:relative;z-index:3}
+.ledge{z-index:0!important}
+.order{z-index:1;bottom:-18px!important;height:124px!important}
+.order .cust{height:124px!important;width:94px!important}
+.order .cu{margin-bottom:0!important}
+.order .cu img{height:116px!important}
+.order .ob{margin-bottom:30px!important}
+.order .say{margin-bottom:30px!important}
 `;
 document.head.appendChild(css);
 document.body.innerHTML=`<section id="shell"><header><div class="lv" id="hlv">🍢 지글지글 포장마차</div><button id="snd" title="소리 켜기/끄기">♪</button><button id="center" title="가운데로">⌖</button><button id="size" title="크기">↗</button><button id="fold" title="접기">−</button><button id="close" title="닫기">×</button></header>
