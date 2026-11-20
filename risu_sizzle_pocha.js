@@ -1,7 +1,7 @@
 //@name risu_sizzle_pocha
 //@display-name 지글지글 포장마차
 //@api 3.0
-//@version 1.9.7
+//@version 1.9.8
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/risu_sizzle_pocha.js
 /*
  * 채팅 중 가볍게 하는 분식 꼬치 정렬 퍼즐 (푸디 시즐 스타일).
@@ -426,7 +426,7 @@ html,body,button,input{font-family:"PochaJua","Pretendard","Apple SD Gothic Neo"
 .order .say em{display:block;font-style:normal;color:#ffd166;font-size:11px;margin-bottom:1px}
 .order .say:empty{display:none}
 #book .mgrid .gh{grid-column:1/-1;margin:6px 0 2px;font-size:15px;color:#5a2e1a;font-weight:400}
-#book .mgrid .spc i{height:58px;display:flex;justify-content:center}
+#book .mgrid .spc i{height:58px;display:flex;justify-content:center;align-items:flex-end}
 #book .mgrid .spc i img{height:100%;width:auto}
 #book .mgrid .spc.lock i{filter:brightness(0) opacity(.22)}
 
