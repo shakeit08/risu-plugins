@@ -766,6 +766,7 @@ const TAG = '[달콤 머지 카페]';
 const COLS = 7, ROWS = 9, START_ROWS = 6;
 const ROW_COST = { 6: 200, 7: 500, 8: 1000 };
 const APP = !!globalThis.__MC_APP;
+const ORD_HI = 8, ORD_HI_P = 0.18; // 주문: Lv.8 이상은 한 주문에 최대 1개, 18% 확률
 const MAX_E = 100, REGEN_MS = 90 * 1000;
 const SAVE_KEY = 'sweet_merge_cafe_save';
 const UNLOCKS = { 3: 'berry', 5: 'choco' };
@@ -1549,6 +1550,7 @@ function sanitize(o) {
   for (const a of AREAS) if (a.gen && s.areaDone[a.k] && !s.chains.includes(a.gen)) { s.chains.push(a.gen); if (!s.pendingGens.includes(a.gen)) s.pendingGens.push(a.gen); }
   scanGens(s);
   s.orders = Array.isArray(o.orders) ? o.orders.filter(od => od && Array.isArray(od.req) && od.req.length && od.req.every(r => CHAINS[r.c] && r.l >= 1 && r.l <= CHAINS[r.c].items.length)).slice(0, 3) : [];
+  s.orders = s.orders.map(od => od.req.filter(r => r.l >= ORD_HI).length > 1 ? genOrder(s) : od);
   while (s.orders.length < 3) s.orders.push(genOrder(s));
   if (o.ev && Array.isArray(o.ev.board)) {
     const ev = { board: Array.from({ length: COLS * ROWS }, (_, i) => { const it = validItem(o.ev.board[i]); return it && (it.b ? null : it); }), rows: Math.min(ROWS, Math.max(START_ROWS, Math.floor(+o.ev.rows || START_ROWS))), chains: ['xmas'],
@@ -1700,12 +1702,19 @@ function genOrder(st) {
   const minL = lv >= 7 ? 3 : 2;
   const n = lv >= 4 ? 3 : Math.random() < 0.5 ? 2 : 1;
   const req = [], used = new Set();
+  // Lv.8 이상(4장부터)은 주문 하나에 최대 1개, 18% 확률로만
+  const capL = Math.min(maxL, ORD_HI - 1);
   for (let i = 0; i < n; i++) {
     const c = pick(chains.filter(x => !used.has(x)).length ? chains.filter(x => !used.has(x)) : chains);
     used.add(c);
     const opts = [];
-    for (let l = minL; l <= maxL; l++) for (let w = 0; w < maxL - l + 1; w++) opts.push(l);
+    for (let l = minL; l <= capL; l++) for (let w = 0; w < maxL - l + 1; w++) opts.push(l);
     req.push({ c, l: Math.min(maxLvOf(c), pick(opts)) });
+  }
+  if (maxL >= ORD_HI && Math.random() < ORD_HI_P) {
+    const r = pick(req), ho = [];
+    for (let l = ORD_HI; l <= maxL; l++) for (let w = 0; w < maxL - l + 1; w++) ho.push(l);
+    r.l = Math.min(maxLvOf(r.c), pick(ho));
   }
   const taken = new Set(st.orders.map(o => o.a));
   const ad = st.areaDone || (S && S.areaDone) || {};
