@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.21.44
+//@version 2.21.45
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -758,7 +758,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest };
 })();
-const VER = '2.21.44';
+const VER = '2.21.45';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest } = ART;
@@ -3378,6 +3378,10 @@ function toast(html, opt = {}) {
   setTimeout(() => { t.animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(-8px)' }], { duration: 250 }).onfinish = () => t.remove(); }, opt.ms || 2600);
 }
 const NOTES = [
+  // 리스 플러그인에만 보이는 소식
+  ...(APP ? [] : [['2.21.45', [
+    '마을·이야기 그림을 열 때마다 다시 받느라 오래 걸리거나, 그림 불러오는 중 1/21에서 멈추던 문제를 고쳤어요. 이제 마을이 바로 열리고, 한 번 본 그림은 다음부터 빨리 떠요.',
+  ]]]),
   ['2.21.41', [
     '마을에 우편함이 생겼어요! 아침·저녁마다 주민들이 에너지나 코인을 담은 편지를 보내고, 우체국 소포도 우편함으로 와요.',
     '처음 하는 분들을 위한 가이드가 생겼어요. 설정(왼쪽 위 Lv)에서 언제든 다시 볼 수 있어요.',
