@@ -1,7 +1,7 @@
 //@name risu_sizzle_pocha
 //@display-name 지글지글 포장마차
 //@api 3.0
-//@version 2.1.0
+//@version 2.1.1
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/risu_sizzle_pocha.js
 /*
  * 채팅 중 가볍게 하는 분식 꼬치 정렬 퍼즐 (푸디 시즐 스타일).
@@ -120,6 +120,7 @@ header button{width:30px;height:30px;border-radius:10px;border:0;background:#5a3
 .plate svg{height:28px;margin-top:-16px;opacity:.95}
 .plate.n1{--pst:var(--i-stack1)}.plate.n2{--pst:var(--i-stack2)}.plate.n3{--pst:var(--i-stack3)}
 .plate.drop{animation:pdrop .3s ease-out}
+.grill .rack{z-index:2}.grill .plate{z-index:1}
 @keyframes pdrop{0%{transform:translateY(-6px)}60%{transform:translateY(2px)}100%{transform:none}}
 .plate .more{position:absolute;right:-10px;top:-6px;background:#3b2014;color:#ffcf8a;font-size:10px;border-radius:99px;padding:0 5px;font-style:normal;font-weight:900}
 .boosters{flex:none;display:flex;justify-content:space-around;padding:8px 6px 14px;background:#4a2816;border-top:3px solid #3b2014}
