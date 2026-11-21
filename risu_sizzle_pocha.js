@@ -1,7 +1,7 @@
 //@name risu_sizzle_pocha
 //@display-name 지글지글 포장마차
 //@api 3.0
-//@version 2.1.1
+//@version 2.1.2
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/risu_sizzle_pocha.js
 /*
  * 채팅 중 가볍게 하는 분식 꼬치 정렬 퍼즐 (푸디 시즐 스타일).
@@ -992,13 +992,28 @@ function say(k,kind){const el=$('#order .say');if(!el||!SPECIAL[k])return;el.inn
 const CUST=['grandma','office','student','kid','worker','nurse','police'];
 const npcImg=(k,e)=>`<img src="${(NPC[k]||NPC.office)[e]}" alt=""${k==='jaem'?' class="sm"':''}>`;
 function typeCounts(){const m={};L.gs.forEach(g=>g.layers.forEach(l=>l.forEach(it=>{if(it)m[it.t]=(m[it.t]||0)+1;})));(L.gs.rail||[]).forEach(r=>m[r.t]=(m[r.t]||0)+1);return m;}
+function orderDepths(){
+  const r={},add=(t,d)=>(r[t]=r[t]||[]).push(d);
+  L.gs.forEach(g=>{const lk=locked(g)?2:0;g.layers.forEach((l,d)=>l.forEach(it=>{if(it)add(it.t,d+lk+(it.ice?1:0));}));});
+  (L.gs.rail||[]).forEach((x,i)=>add(x.t,Math.floor(i/6)));
+  Object.values(r).forEach(a=>a.sort((x,y)=>x-y));return r;
+}
+function pickType(dp,ex){
+  const c=Object.keys(dp).map(Number).filter(t=>dp[t].length>=3&&!ex.includes(t));
+  if(!c.length)return null;
+  const w=c.map(t=>{const d=dp[t][0]+dp[t][1]+dp[t][2];return 1/Math.pow(1+d,2.2);});
+  let x=Math.random()*w.reduce((a,b)=>a+b,0);for(let i=0;i<c.length;i++){x-=w[i];if(x<=0)return c[i];}return c[c.length-1];
+}
 function spawnOrder(){
-  const m=typeCounts(),types=shuffle(Object.keys(m).map(Number).filter(t=>m[t]>=3));
-  if(!types.length||L.cfg.sets-L.served<3)return false;
-  const deliv=types.length>=2&&Math.random()<.4;
+  const dp=orderDepths(),cnt=Object.values(dp).filter(a=>a.length>=3).length;
+  if(!cnt||L.cfg.sets-L.served<3)return false;
+  const deliv=cnt>=2&&Math.random()<.4;
   const sauceOk=L.gs.some(g=>g.sauce&&!locked(g));
-  const items=types.slice(0,deliv?2:1).map(t=>({t,need:(!deliv&&m[t]>=6&&Math.random()<.45)?2:1,got:0,sauce:sauceOk&&Math.random()<.5}));
-  const sets=items.reduce((a,x)=>a+x.need,0),dur=17+sets*10+(deliv?5:0);
+  const ts=[pickType(dp,[])];if(deliv)ts.push(pickType(dp,ts));
+  const d3=t=>dp[t][0]+dp[t][1]+dp[t][2],d6=t=>dp[t].length>=6?dp[t].slice(0,6).reduce((a,b)=>a+b,0):99;
+  const items=ts.filter(t=>t!=null).map(t=>({t,need:(!deliv&&d6(t)<=4&&Math.random()<.45)?2:1,got:0,sauce:sauceOk&&Math.random()<.5}));
+  const deep=items.reduce((a,x)=>a+(x.need>1?d6(x.t):d3(x.t)),0);
+  const sets=items.reduce((a,x)=>a+x.need,0),dur=17+sets*10+(deliv?5:0)+Math.min(12,deep*2);
   const sp=L.n>=5&&Math.random()<1/8;const who=sp?SPK[rnd(SPK.length)]:deliv?'rider':CUST[rnd(CUST.length)];
   if(sp){D.met=D.met||{};D.met[who]=1;save();}
   L.order={who,special:sp,deliv,items,dur,left:dur,done:false};
