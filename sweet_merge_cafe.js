@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.21.46
+//@version 2.21.47
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -758,7 +758,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest };
 })();
-const VER = '2.21.46';
+const VER = '2.21.47';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest } = ART;
@@ -3394,6 +3394,9 @@ function toast(html, opt = {}) {
 }
 const NOTES = [
   // 리스 플러그인에만 보이는 소식
+  ['2.21.47', [
+    '3장 가을 숲의 꿀떡(레서판다)과 반짝(박쥐)에게 말을 걸면 대사 없이 멈추고 간식(에너지)을 못 받던 문제를 고쳤어요.',
+  ]],
   ['2.21.46', [
     '주문에 Lv.8 이상 재료는 한 주문에 최대 1개만, 가끔씩 나와요.',
     '크리스마스 판에 있을 때 데이터 백업을 하면 주방 판과 크리스마스 판이 뒤바뀌어 저장되던 문제를 고쳤어요.',
@@ -4664,13 +4667,15 @@ const TALK = {
   turtle: ['천…천…히… 가도 돼~', '파도 소리 들으면 졸려…', '바다는… 기억력이 좋대~', '서핑은 느긋하게 해야 해~'],
   gull: ['끼룩! 바다 소식 왔어!', '섬들이 또 움직였어!', '모래성 하나 같이 쌓을래?', '하늘에서 보면 다 보여!'],
   flamingo: ['바람이 좋은 날이야.', '돛은 내가 제일 잘 펴!', '한 발로 서는 게 편해.', '바다 건너 항구 가 봤어?'],
+  redpanda: ['꿀단지에 꿀이 가득 찼어!', '꼬리 줄무늬 예쁘지?', '커피 젤리 파르페 먹으러 갈래?', '벌들이 오늘도 부지런해~'],
+  bat: ['밤하늘 사탕, 별처럼 반짝이지?', '낮엔 좀 졸려… 하암.', '거꾸로 매달리면 세상이 달라 보여!', '밤 산책 전엔 초코 컵케이크!'],
   penguin: ['아이스크림 하나 주세요!', '추운 날이 제일 좋아.', '미끄러지지 않게 조심해.', '젤라토 신메뉴 기대 중!'],
 };
 const pokeLine = key => {
   const ex = [];
   if (S.ev) ex.push('광장 트리 보러 갈래?', '눈송이 많이 모았어?', '메리 크리스마스!');
   if (done('station')) ex.push('기차 타고 새 이웃이 왔대!');
-  return pick([...TALK[key], ...ex]);
+  return pick([...(TALK[key] || ['안녕!', '오늘도 좋은 하루!']), ...ex]);
 };
 let walkRaf = 0;
 function startWalkers(lanes) {
