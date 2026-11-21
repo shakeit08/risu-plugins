@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.21.47
+//@version 2.21.46
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -758,7 +758,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest };
 })();
-const VER = '2.21.47';
+const VER = '2.21.46';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest } = ART;
@@ -1553,7 +1553,7 @@ function sanitize(o) {
   s.orders = s.orders.map(od => od.req.filter(r => r.l >= ORD_HI).length > 1 ? genOrder(s) : od);
   while (s.orders.length < 3) s.orders.push(genOrder(s));
   if (o.ev && Array.isArray(o.ev.board)) {
-    const ev = { board: Array.from({ length: COLS * ROWS }, (_, i) => { return validItem(o.ev.board[i]); }), rows: Math.min(ROWS, Math.max(START_ROWS, Math.floor(+o.ev.rows || START_ROWS))), chains: ['xmas'],
+    const ev = { board: Array.from({ length: COLS * ROWS }, (_, i) => { const it = validItem(o.ev.board[i]); return it && (it.b ? null : it); }), rows: Math.min(ROWS, Math.max(START_ROWS, Math.floor(+o.ev.rows || START_ROWS))), chains: ['xmas'],
       orders: Array.isArray(o.ev.orders) ? o.ev.orders.filter(od => od && Array.isArray(od.req) && od.req.length && od.req.every(r => r.c === 'xmas' && r.l >= 1 && r.l <= 7)).slice(0, 3) : [] };
     fillEvOrders(s, ev);
     s.ev = ev;
@@ -1629,17 +1629,11 @@ function checkEvent() {
   }
   if (S.ev) {
     if (S.onEv) swapEv();
-    // 크리스마스 재료·생산기는 코인으로 정산, 그 밖의 물건(주방 재료·생산기·보따리·상자·주스·금화·도구)은 주방으로 옮김
-    let gain = 0, moved = 0;
-    S.ev.board.forEach(it => {
-      if (!it) return;
-      if (it.c === 'xmas') gain += sellPrice(it.l);
-      else if (it.g === 'xmas') gain += 20;
-      else { S.pendingItems.push(it); moved++; }
-    });
+    let gain = 0;
+    S.ev.board.forEach(it => { if (it && it.c) gain += sellPrice(it.l); else if (it && it.g) gain += 20; });
     S.coins += gain; S.ev = null; S.evTab = false;
     if (areaFull(AREAS.find(a => a.k === 'plaza'))) S.coll.xmas = true;
-    return { end: true, gain, moved };
+    return { end: true, gain };
   }
   return null;
 }
@@ -3133,6 +3127,7 @@ const SFX = {
   levelup: () => { [523, 659, 784, 1047].forEach((f, i) => tone(f, i * .09, .22, 'triangle', .1)); tone(1319, .38, .4, 'sine', .09); },
   decor: () => { [1047, 1319, 1568, 2093].forEach((f, i) => tone(f, i * .06, .16, 'sine', .06)); },
   error: () => tone(230, 0, .13, 'square', .035, 170),
+  tick: () => { tone(1700, 0, .028, 'triangle', .06, 1100); tone(640, 0, .022, 'sine', .035); },
   ui: () => tone(720, 0, .045, 'sine', .05),
 };
 const sfx = (k, a) => { try { SFX[k](a); } catch (_) { } };
@@ -3394,20 +3389,6 @@ function toast(html, opt = {}) {
 }
 const NOTES = [
   // 리스 플러그인에만 보이는 소식
-  ['2.21.47', [
-    '3장 가을 숲의 꿀떡(레서판다)과 반짝(박쥐)에게 말을 걸면 대사 없이 멈추고 간식(에너지)을 못 받던 문제를 고쳤어요.',
-  ]],
-  ['2.21.46', [
-    '주문에 Lv.8 이상 재료는 한 주문에 최대 1개만, 가끔씩 나와요.',
-    '크리스마스 판에 있을 때 데이터 백업을 하면 주방 판과 크리스마스 판이 뒤바뀌어 저장되던 문제를 고쳤어요.',
-    '크리스마스 판에 꺼내 둔 보따리가 게임을 다시 열면 사라지던 문제를 고쳤어요.',
-    '크리스마스 이벤트가 끝날 때 크리스마스 판에 남은 보따리·선물 상자·주스·금화·도구·생산기·주방 재료는 없어지지 않고 주방으로 옮겨져요.',
-    '크리스마스 판에 있을 때 가게를 완성하면 새 생산기 재료가 크리스마스 주문에 섞이던 문제를 고쳤어요.',
-    '상점에서 에너지를 사면 알림에 +50으로 보이던 것을 실제로 받는 양(+100)으로 고쳤어요.',
-    '마을을 여러 번 오가면 조금씩 무거워지던 문제를 고쳤어요.',
-    '크리스마스 판에 있다가 게임을 다시 열면 화면에는 주방 판이 보이던 문제를 고쳤어요.',
-    ...(APP ? [] : ['예전 버전에서 받아 둔 마을 그림 묶음을 기기에서 지워 저장 공간을 비워요.']),
-  ]],
   ...(APP ? [] : [['2.21.45', [
     '마을·이야기 그림을 열 때마다 다시 받느라 오래 걸리거나, 그림 불러오는 중 1/21에서 멈추던 문제를 고쳤어요. 이제 마을이 바로 열리고, 한 번 본 그림은 다음부터 빨리 떠요.',
   ]]]),
@@ -3660,7 +3641,7 @@ function openShop(fromEmpty) {
     if (S.coins < price) return;
     S.coins -= price; S.shop.buys++; addEnergy(100, true); sfx('coin');
     m.remove(); renderTop(); save();
-    toast(`에너지 충전 완료! <span class="mc-mini">${UI.bolt}+100</span>`);
+    toast(`에너지 충전 완료! <span class="mc-mini">${UI.bolt}+50</span>`);
   });
 }
 function openEvo(c, cur) {
@@ -3701,7 +3682,7 @@ function openDex() {
     }).join('')}</div>`, m => m.querySelector('.mc-card').classList.add('mc-dexcard'));
 }
 function openSettings() {
-  const dump = JSON.stringify(normState());
+  const dump = JSON.stringify(S);
   const m = modal(`<h3>설정</h3>
     ${APP ? '' : `<div class="mc-sec"><h4>채팅 보너스 에너지</h4><div class="mc-sub" style="margin-bottom:6px">리스에서 메시지를 보낼 때마다 충전되는 양</div>
       <div class="mc-seg">${CHAT_E_OPTIONS.map(v => `<button class="mc-btn wh ${S.settings.chatE === v ? 'on' : ''}" data-ce="${v}">${v ? '+' + v : '끄기'}</button>`).join('')}</div></div>`}
@@ -3736,7 +3717,7 @@ function openSettings() {
     m.querySelectorAll('[data-evp]').forEach(x => x.classList.toggle('on', x === b));
     const r = checkEvent(); renderAll(); save();
     if (r === 'start' && !S.story.seen.xmas_intro) { m.remove(); playStory('xmas_intro'); }
-    else if (r && r.end) { m.remove(); placePending(); renderAll(); save(); toast(`크리스마스 판을 정리했어요 <span class="mc-mini">${UI.coin}+${r.gain}</span>${r.moved ? ` · 물건 ${r.moved}개는 주방으로 옮겼어요` : ''}`); }
+    else if (r && r.end) { m.remove(); toast(`크리스마스 판을 정리했어요 <span class="mc-mini">${UI.coin}+${r.gain}</span>`); }
   });
   m.querySelectorAll('[data-story]').forEach(b => b.onclick = () => {
     S.settings.story = b.dataset.story === '1'; save();
@@ -3963,8 +3944,6 @@ const extDbGet = name => extDbDo('readonly', st => st.get(name));
 const extDbPut = (name, b) => extDbDo('readwrite', st => st.put(b.slice().buffer, name));
 // 이름(지문)이 바뀐 옛 파일은 지움
 const extDbClean = () => extDbDo('readwrite', st => { const q = st.getAllKeys(); q.onsuccess = () => q.result.forEach(k => { if (!extAll.includes(k)) st.delete(k); }); return null; });
-// 2.21.44부터 묶음 파일을 안 쓰므로, 예전에 받아 둔 묶음 저장소는 통째로 지움
-if (!extAll.length) { try { indexedDB.deleteDatabase(EXT_DB); } catch (_) { } }
 async function extOne(name) {
   try {
     const c = await extDbGet(name);
@@ -4065,24 +4044,14 @@ function openTown() {
     moved = false;
     if (ev.pointerType !== 'mouse' || ev.button !== 0) return;
     dragX = { x: ev.clientX, s: sc.scrollLeft };
-    // 창 전체 리스너는 끄는 동안에만 달아 둠 (마을을 열 때마다 쌓이지 않게)
-    window.addEventListener('pointermove', dragMove);
-    window.addEventListener('pointerup', dragEnd);
-    window.addEventListener('pointercancel', dragEnd);
   });
-  const dragMove = ev => {
+  window.addEventListener('pointermove', ev => {
     if (!dragX) return;
     const dx = ev.clientX - dragX.x;
     if (Math.abs(dx) > 8) { moved = true; sc.classList.add('drag'); }
     if (moved) sc.scrollLeft = dragX.s - dx;
-  };
-  const dragEnd = () => {
-    window.removeEventListener('pointermove', dragMove);
-    window.removeEventListener('pointerup', dragEnd);
-    window.removeEventListener('pointercancel', dragEnd);
-    if (dragX) setTimeout(() => { moved = false; }, 0);
-    dragX = null; sc.classList.remove('drag');
-  };
+  });
+  window.addEventListener('pointerup', () => { if (dragX) setTimeout(() => { moved = false; }, 0); dragX = null; sc.classList.remove('drag'); });
   v.addEventListener('click', ev => {
     if (moved && ev.target.closest('.tw-scroll')) { moved = false; ev.stopPropagation(); return; }
     const b = ev.target.closest('[data-tw]');
@@ -4585,6 +4554,22 @@ function openSpin() {
     wh.style.transition = 'transform 4.2s cubic-bezier(.15,.7,.2,1)';
     wh.style.transform = `rotate(${deg}deg)`;
     msg.textContent = '두근두근…';
+    // 돌아가는 동안 칸을 지날 때마다 또로록
+    let prevA = null, acc = 0, lastSeg = null;
+    const tickLoop = () => {
+      if (!busy || !m.isConnected) return;
+      const v = (getComputedStyle(wh).transform || '').match(/matrix\(([^)]+)\)/);
+      if (v) {
+        const [a1, b1] = v[1].split(',').map(Number), a = Math.atan2(b1, a1) * 180 / Math.PI;
+        if (prevA !== null) { let d = a - prevA; if (d < -180) d += 360; if (d > 180) d -= 360; acc += d; }
+        prevA = a;
+        const seg = Math.floor((acc + 22.5) / 45);
+        if (lastSeg !== null && seg !== lastSeg) sfx('tick');
+        lastSeg = seg;
+      }
+      requestAnimationFrame(tickLoop);
+    };
+    requestAnimationFrame(tickLoop);
     setTimeout(() => {
       sfx('discover'); renderTop(); $('.mc-town') && renderTown();
       msg.innerHTML = boxR ? `<b class="sp-win"><i>${boxR.icon}</i>${esc(boxR.txt)} 당첨!</b>` : `<b class="sp-win"><i>${t === 'e' ? UI.bolt : UI.coin}</i>${t === 'e' ? '에너지' : '코인'} ${n} 당첨!</b>`;
@@ -4667,15 +4652,13 @@ const TALK = {
   turtle: ['천…천…히… 가도 돼~', '파도 소리 들으면 졸려…', '바다는… 기억력이 좋대~', '서핑은 느긋하게 해야 해~'],
   gull: ['끼룩! 바다 소식 왔어!', '섬들이 또 움직였어!', '모래성 하나 같이 쌓을래?', '하늘에서 보면 다 보여!'],
   flamingo: ['바람이 좋은 날이야.', '돛은 내가 제일 잘 펴!', '한 발로 서는 게 편해.', '바다 건너 항구 가 봤어?'],
-  redpanda: ['꿀단지에 꿀이 가득 찼어!', '꼬리 줄무늬 예쁘지?', '커피 젤리 파르페 먹으러 갈래?', '벌들이 오늘도 부지런해~'],
-  bat: ['밤하늘 사탕, 별처럼 반짝이지?', '낮엔 좀 졸려… 하암.', '거꾸로 매달리면 세상이 달라 보여!', '밤 산책 전엔 초코 컵케이크!'],
   penguin: ['아이스크림 하나 주세요!', '추운 날이 제일 좋아.', '미끄러지지 않게 조심해.', '젤라토 신메뉴 기대 중!'],
 };
 const pokeLine = key => {
   const ex = [];
   if (S.ev) ex.push('광장 트리 보러 갈래?', '눈송이 많이 모았어?', '메리 크리스마스!');
   if (done('station')) ex.push('기차 타고 새 이웃이 왔대!');
-  return pick([...(TALK[key] || ['안녕!', '오늘도 좋은 하루!']), ...ex]);
+  return pick([...TALK[key], ...ex]);
 };
 let walkRaf = 0;
 function startWalkers(lanes) {
@@ -4848,7 +4831,7 @@ function upgradeDecor(k) {
     S.coins += A.reward.coins; if (A.reward.e) addEnergy(A.reward.e, true);
     const onceR = A.once ? drawGive(A.once[0], A.once[1]) : null;
     const boxR = A.event ? null : drawGive('box', 2);
-    if (A.gen && !mainChains().includes(A.gen)) { mainChains().push(A.gen); placeGenerator(A.gen); }
+    if (A.gen && !MC().includes(A.gen)) { MC().push(A.gen); placeGenerator(A.gen); }
     const nx0 = AREAS[ai + 1] && !AREAS[ai + 1].event ? AREAS[ai + 1] : null, nx = nx0 && chOpen(nx0.ch || 1) ? nx0 : null;
     const stLeft = nx0 && !nx ? VILLAGES[villageOf(A.ch || 1)].chs.reduce((s, c) => s + STREET[c].filter((_, j) => SL(stKey(c, j)) < 3).length, 0) : 0;
     setTimeout(() => playStory(A.k, () => {
@@ -5052,7 +5035,7 @@ function mailClaim(x) {
 }
 function openMail() {
   $('.mc-mailw')?.closest('.mc-modal')?.remove();
-  const L = S.mail.list;
+  const L = S.mail.list, hasRw = x => x.rw.e || x.rw.c || x.rw.s || x.rw.x.length;
   const row = x => {
     const face = x.k === 'r' && x.a >= 0 ? iconAnimal(x.a) : x.k === 'p' ? MAIL_ICON() : `<span class="ml-dev">${UI.star}</span>`;
     const has = x.rw.e || x.rw.c || x.rw.s || x.rw.x.length;
@@ -5060,10 +5043,15 @@ function openMail() {
   };
   const m = modal(`<button class="mc-xbtn" data-x aria-label="닫기">×</button><h3>우편함</h3>
     <div class="mc-mailw">${L.length ? L.map(row).join('') : '<p class="mc-sub" style="text-align:center;margin:18px 0">아직 편지가 없어요. 아침·저녁마다 주민들이 편지를 보내요.</p>'}</div>
-    ${L.some(x => !x.got && (x.rw.e || x.rw.c || x.rw.s || x.rw.x.length)) ? '<div class="acts"><button class="mc-btn pk" data-all>모두 받기</button></div>' : ''}`, mm => mm.querySelector('.mc-card').classList.add('mc-mailcard'));
+    ${L.some(x => !x.got && hasRw(x)) || L.some(x => x.got || !hasRw(x)) ? `<div class="acts">${L.some(x => x.got || !hasRw(x)) ? '<button class="mc-btn wh" data-del>읽은 편지 지우기</button>' : ''}${L.some(x => !x.got && hasRw(x)) ? '<button class="mc-btn pk" data-all>모두 받기</button>' : ''}</div>` : ''}`, mm => mm.querySelector('.mc-card').classList.add('mc-mailcard'));
   const done1 = () => { sfx('coin'); renderTop(); renderBoard(); save(); mailBadge(); openMail(); };
   m.querySelectorAll('[data-get]').forEach(b => b.onclick = () => { const x = L.find(y => y.id === b.dataset.get); if (x) { mailClaim(x); done1(); } });
   m.querySelector('[data-all]')?.addEventListener('click', () => { L.forEach(mailClaim); done1(); });
+  m.querySelector('[data-del]')?.addEventListener('click', () => {
+    const n = L.filter(x => x.got).length; if (!n) return;
+    for (let i = L.length - 1; i >= 0; i--) if (L[i].got) L.splice(i, 1);
+    sfx('ui'); save(); mailBadge(); openMail(); toast(`읽은 편지 ${n}통을 지웠어요.`, { icon: MAIL_ICON() });
+  });
   // 보상 없는 편지는 열면 읽음 처리
   if (L.some(x => !x.got && !(x.rw.e || x.rw.c || x.rw.s || x.rw.x.length))) { L.forEach(x => { if (!(x.rw.e || x.rw.c || x.rw.s || x.rw.x.length)) x.got = true; }); save(); mailBadge(); }
 }
@@ -5195,16 +5183,15 @@ async function openGame() {
       { const nm = checkMail(); if (nm) toast(`우편함에 새 편지가 ${nm}통 왔어요! 마을에서 열어 보세요.`, { icon: MAIL_ICON() }); fetchDevMail(); }
       setTimeout(() => runTut('k'), 900);
       const evr = checkEvent();
-      // 크리스마스 탭에서 껐다 켠 경우: 판을 바꾼 뒤 화면도 다시 그림 (안 그러면 주방 판이 보인 채로 크리스마스 판이 눌림)
-      if (S.evTab && S.ev && !S.onEv) { swapEv(); renderAll(); }
-      else if (evr) renderAll();
+      if (S.evTab && S.ev && !S.onEv) swapEv();
+      if (evr) renderAll();
       const prevVer = S.seenVer;
       if (prevVer !== VER) { if (prevVer ? verCmp(prevVer, '2.13.2') < 0 : S.level > 1) { addEnergy(100, true); renderTop(); toast(`업데이트 기념 선물이에요! <span class="mc-mini">${UI.bolt}+100</span>`); }
         // 2.21.27 업데이트 선물: 왕관 선물 상자 3개
         if (prevVer ? verCmp(prevVer, '2.21.27') < 0 : S.level > 1) { for (let k = 0; k < 3; k++) placeItem({ x: 3 }); renderBoard(); toast(`업데이트 선물로 <b>${esc(CHEST[3].name)}</b> 3개가 도착했어요!`, { icon: iconChest(3) }); } S.seenVer = VER; if (prevVer || S.level > 1) setTimeout(() => { if (!$('.mc-story') && !$('.mc-modal')) openNotes(prevVer ? (verCmp(prevVer, '2.13.2') > 0 && verCmp(prevVer, '2.15.0') <= 0 ? '2.13.2' : prevVer) : NOTES[4][0]); }, 500); }
       if (!S.story.intro) { S.story.intro = true; save(); playStory('intro'); }
       else if (evr === 'start' && !S.story.seen.xmas_intro) setTimeout(() => playStory('xmas_intro'), 400);
-      else if (evr && evr.end) { playStory('xmas_end'); if (evr.gain || evr.moved) toast(`크리스마스 판에 남은 물건을 정산했어요 <span class="mc-mini">${UI.coin}+${evr.gain}</span>${evr.moved ? ` · 물건 ${evr.moved}개는 주방으로 옮겼어요` : ''}`); }
+      else if (evr && evr.end) { playStory('xmas_end'); if (evr.gain) toast(`크리스마스 판에 남은 물건을 정산했어요 <span class="mc-mini">${UI.coin}+${evr.gain}</span>`); }
       save();
       if (S.pendingGens.length || S.pendingItems.length) { placePending(); renderAll(); save(); }
     });
