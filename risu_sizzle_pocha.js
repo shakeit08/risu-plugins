@@ -1,7 +1,7 @@
 //@name risu_sizzle_pocha
 //@display-name 지글지글 포장마차
 //@api 3.0
-//@version 2.6.2
+//@version 2.6.3
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/risu_sizzle_pocha.js
 /*
  * 채팅 중 가볍게 하는 분식 꼬치 정렬 퍼즐 (푸디 시즐 스타일).
@@ -307,8 +307,15 @@ header button{width:30px;height:30px;border-radius:10px;border:0;background:#5a3
 @keyframes custin{from{transform:translateX(-110%)}}
 .order.leave{transition:transform .45s ease-in,opacity .45s;transform:translateX(-110%);opacity:0}
 .order .cust{flex:none;width:74px;height:86px;position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:center}
-.order .cu{font-size:62px!important;line-height:1;margin-bottom:6px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.3))}
+.order .cu{position:relative;isolation:isolate;font-size:62px!important;line-height:1;margin-bottom:6px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.3))}
 .order .cu img{height:86px;width:auto;display:block}
+.order.failed .cu::after{
+  content:"";position:absolute;inset:0;pointer-events:none;clip-path:var(--face-clip);
+  background:linear-gradient(to bottom,#ff5147dc var(--flush-from),#ff605990 calc((var(--flush-from) + var(--flush-to)) / 2),#ff6b6300 var(--flush-to));
+  mix-blend-mode:multiply;animation:faceFlushIn .24s ease-out both;
+}
+@keyframes faceFlushIn{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.order.failed .cu::after{animation:none}}
 .order .ob{position:relative;z-index:3;align-self:center;margin-bottom:12px;background:#fffdf7;border:3px solid #3b2014;border-radius:14px;padding:5px 8px 5px;box-shadow:0 3px 0 #2a150b;display:flex;flex-direction:column;gap:3px;min-width:120px}
 .order .ob::before{content:"";position:absolute;left:-11px;top:50%;width:14px;height:14px;background:#fffdf7;border-left:3px solid #3b2014;border-bottom:3px solid #3b2014;transform:translateY(-50%) rotate(45deg)}
 .order .oi{display:flex;gap:6px!important}
@@ -752,7 +759,14 @@ function runTimer(){
     if(!L||!L.running||L.paused)return;
     L.time-=dt;L.elapsed=(L.elapsed||0)+dt;
     if(now>=(L.nextSmoke||0)){L.nextSmoke=now+1100+Math.random()*1700;const cs=L.gs.map((g,i)=>i).filter(i=>!locked(L.gs[i])&&L.gs[i].layers[0].some(Boolean));if(cs.length)smokeAt(cs[rnd(cs.length)],2+rnd(2));}
-    if(L.cfg.orders){if(!L.order&&L.elapsed>=L.nextOrder){if(!spawnOrder())L.nextOrder=L.elapsed+5;}if(L.order&&!L.order.done){L.order.left-=dt;renderOrder();if(L.order.left<=0)finishOrder(false);}}
+    if(L.cfg.orders){
+      if(!L.order&&L.elapsed>=L.nextOrder&&!spawnOrder())L.nextOrder=L.elapsed+5;
+      if(L.order&&!L.order.result){
+        L.order.left-=dt;
+        if(L.order.left<=0)finishOrder(false);
+        else renderOrder();
+      }
+    }
     if(L.combo>0){const f=1-(now-L.last)/7000;if(f<=0){L.combo=0;$('#comboBox').classList.remove('on');}else $('#comboBar').style.width=(f*100)+'%';}
     if(L.time<=0){L.time=0;updLevelHud();timeUp();return;}
     updLevelHud();
@@ -1020,6 +1034,28 @@ const SPK=Object.keys(SPECIAL);
 function say(k,kind){const el=$('#order .say');if(!el||!SPECIAL[k])return;el.innerHTML=`<em>${SPECIAL[k].n}</em>${SPECIAL[k][kind]}`;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),kind==='in'?3200:2200);}
 const CUST=['grandma','office','student','kid','worker','nurse','police'];
 const npcImg=(k,e)=>`<img src="${(NPC[k]||NPC.office)[e]}" alt=""${k==='jaem'?' class="sm"':''}>`;
+const ORDER_HURRY_SECONDS=5;
+// 화난 표정 이미지 기준의 그라데이션 시작·끝 높이(%)와 얼굴 윤곽.
+const NPC_FACE_FLUSH={
+  rider:[29,56,'20% 38%, 28% 34%, 41% 30%, 41% 38%, 54% 36%, 65% 32%, 71% 28%, 79% 33%, 83% 42%, 81% 56%, 73% 60%, 27% 60%, 20% 55%'],
+  grandma:[30,59,'19% 39%, 31% 37%, 43% 34%, 53% 30%, 60% 26%, 66% 31%, 73% 35%, 80% 37%, 83% 47%, 80% 58%, 68% 63%, 31% 63%, 19% 56%'],
+  office:[28,57,'20% 36%, 34% 34%, 46% 31%, 55% 28%, 61% 24%, 68% 25%, 75% 30%, 80% 35%, 81% 49%, 78% 56%, 69% 61%, 31% 61%, 20% 54%'],
+  student:[34,60,'17% 43%, 25% 39%, 31% 35%, 35% 31%, 37% 38%, 42% 41%, 48% 42%, 49% 39%, 55% 42%, 62% 41%, 69% 39%, 70% 56%, 61% 62%, 29% 62%, 17% 56%'],
+  kid:[33,60,'18% 42%, 23% 35%, 27% 38%, 32% 35%, 38% 29%, 43% 37%, 50% 38%, 53% 36%, 55% 31%, 59% 35%, 63% 31%, 69% 29%, 74% 35%, 78% 40%, 82% 42%, 80% 56%, 70% 62%, 28% 62%, 19% 56%'],
+  worker:[33,59,'21% 41%, 24% 36%, 27% 33%, 72% 33%, 76% 37%, 80% 41%, 79% 56%, 71% 62%, 29% 62%, 20% 55%'],
+  nurse:[32,58,'21% 42%, 26% 37%, 36% 34%, 44% 30%, 47% 27%, 44% 35%, 51% 34%, 58% 31%, 62% 22%, 67% 28%, 74% 34%, 78% 40%, 78% 54%, 70% 60%, 29% 60%, 22% 54%'],
+  police:[37,60,'21% 44%, 25% 39%, 30% 34%, 41% 37%, 63% 37%, 71% 34%, 77% 39%, 80% 44%, 79% 57%, 68% 64%, 31% 64%, 22% 57%'],
+  yuzu:[39,66,'26% 48%, 32% 41%, 37% 36%, 39% 41%, 43% 46%, 47% 50%, 57% 50%, 61% 45%, 63% 36%, 68% 42%, 75% 49%, 73% 60%, 67% 66%, 36% 66%, 28% 59%'],
+  lemon:[38,64,'25% 49%, 29% 42%, 35% 36%, 39% 32%, 40% 40%, 44% 46%, 49% 49%, 54% 50%, 59% 49%, 60% 40%, 60% 36%, 66% 43%, 75% 49%, 72% 60%, 65% 65%, 34% 65%, 26% 59%'],
+  jaem:[37,63,'29% 46%, 34% 39%, 39% 32%, 40% 40%, 44% 45%, 51% 47%, 55% 45%, 57% 41%, 59% 45%, 64% 43%, 68% 38%, 70% 47%, 69% 57%, 63% 64%, 38% 64%, 31% 59%'],
+  claude:[37,63,'24% 47%, 28% 41%, 33% 36%, 34% 32%, 38% 40%, 42% 44%, 48% 46%, 58% 46%, 63% 43%, 66% 37%, 68% 35%, 73% 40%, 76% 45%, 74% 57%, 66% 64%, 35% 64%, 26% 58%'],
+  gpt:[39,64,'23% 52%, 27% 48%, 31% 43%, 34% 37%, 36% 43%, 39% 48%, 44% 52%, 44% 49%, 48% 52%, 54% 52%, 57% 50%, 59% 39%, 63% 44%, 68% 49%, 73% 51%, 73% 55%, 71% 60%, 68% 64%, 62% 67%, 37% 67%, 28% 64%, 24% 59%'],
+  cara:[34,66,'31% 60%, 37% 54%, 44% 49%, 50% 43%, 56% 37%, 60% 30%, 63% 26%, 68% 32%, 73% 40%, 77% 48%, 76% 56%, 70% 63%, 62% 68%, 42% 68%, 34% 64%'],
+  dennis:[39,68,'26% 54%, 32% 51%, 35% 48%, 39% 54%, 44% 55%, 48% 49%, 51% 55%, 55% 49%, 58% 44%, 59% 35%, 64% 35%, 69% 37%, 72% 42%, 72% 49%, 76% 46%, 78% 55%, 76% 65%, 69% 71%, 36% 71%, 28% 65%'],
+  diego:[41,69,'27% 54%, 33% 47%, 38% 41%, 38% 47%, 41% 49%, 45% 47%, 47% 54%, 51% 51%, 55% 44%, 55% 35%, 60% 36%, 64% 39%, 66% 37%, 69% 39%, 70% 47%, 75% 52%, 77% 57%, 75% 66%, 68% 72%, 34% 72%, 28% 66%'],
+  amaraf:[37,68,'26% 52%, 26% 43%, 29% 36%, 33% 33%, 38% 30%, 41% 30%, 43% 37%, 44% 48%, 43% 53%, 50% 61%, 56% 61%, 59% 54%, 62% 49%, 65% 47%, 68% 49%, 74% 53%, 77% 54%, 73% 65%, 65% 69%, 36% 69%, 28% 64%'],
+  amaram:[38,69,'24% 55%, 28% 53%, 32% 55%, 35% 58%, 40% 60%, 44% 63%, 48% 63%, 46% 59%, 53% 62%, 57% 60%, 54% 53%, 53% 44%, 54% 37%, 57% 34%, 63% 35%, 69% 40%, 73% 45%, 77% 52%, 77% 59%, 73% 65%, 66% 70%, 34% 70%, 26% 65%']
+};
 function typeCounts(){const m={};L.gs.forEach(g=>g.layers.forEach(l=>l.forEach(it=>{if(it)m[it.t]=(m[it.t]||0)+1;})));(L.gs.rail||[]).forEach(r=>m[r.t]=(m[r.t]||0)+1);return m;}
 function orderDepths(){
   const r={},add=(t,d)=>(r[t]=r[t]||[]).push(d);
@@ -1045,7 +1081,7 @@ function spawnOrder(){
   const sets=items.reduce((a,x)=>a+x.need,0),dur=17+sets*10+(deliv?5:0)+Math.min(12,deep*2);
   const sp=L.n>=5&&Math.random()<1/8;const who=sp?SPK[rnd(SPK.length)]:deliv?'rider':CUST[rnd(CUST.length)];
   if(sp){D.met=D.met||{};D.met[who]=1;save();}
-  L.order={who,special:sp,deliv,items,dur,left:dur,done:false};
+  L.order={who,special:sp,deliv,items,dur,left:dur,result:null};
   renderOrder(true);sfx('bell');if(sp)setTimeout(()=>say(who,'in'),350);setTimeout(()=>tip(items.some(x=>x.sauce)&&D.tips.order?'sauce':'order'),500);return true;
 }
 function renderOrder(fresh){
@@ -1053,25 +1089,36 @@ function renderOrder(fresh){
   if(!o){el.classList.add('hidden');el.innerHTML='';return;}
   if(fresh||!el.firstChild){
     el.classList.remove('hidden','leave');
-    el.innerHTML=`<div class="cust"><span class="cu">${npcImg(o.who,'dot')}</span></div><div class="ob"><div class="oi">${o.items.map((x,i)=>`<b data-i="${i}" class="${x.sauce?'sc':''}">${x.sauce?'<u>🌶️</u>':''}<i>${FOOD_SVG[x.t]}</i><em></em></b>`).join('')}</div><div class="obot"><span class="obar"><i></i></span><s class="otime"></s></div><button class="ox" title="주문 거절">✕</button></div><div class="say"></div>`;
-    el.querySelector('.ox').onclick=e=>{e.stopPropagation();if(L&&L.order&&!L.order.done&&L.running)finishOrder(false);};
+    const [from,to,clip]=NPC_FACE_FLUSH[o.who]||NPC_FACE_FLUSH.office;
+    el.innerHTML=`<div class="cust"><span class="cu" style="--flush-from:${from}%;--flush-to:${to}%;--face-clip:polygon(${clip})"></span></div><div class="ob"><div class="oi">${o.items.map((x,i)=>`<b data-i="${i}" class="${x.sauce?'sc':''}">${x.sauce?'<u>🌶️</u>':''}<i>${FOOD_SVG[x.t]}</i><em></em></b>`).join('')}</div><div class="obot"><span class="obar"><i></i></span><s class="otime"></s></div><button class="ox" title="주문 거절">✕</button></div><div class="say"></div>`;
+    el.querySelector('.ox').onclick=e=>{e.stopPropagation();if(L&&L.order&&!L.order.result&&L.running)finishOrder(false);};
   }
   o.items.forEach((x,i)=>{const b=el.querySelector(`b[data-i="${i}"]`);if(!b)return;b.classList.toggle('ok',x.got>=x.need);b.querySelector('em').textContent=x.got>=x.need?'✔':`×${x.need-x.got}`;});
   const bar=el.querySelector('.obar i');if(bar)bar.style.transform=`scaleX(${Math.max(0,o.left/o.dur)})`;
   const tt=el.querySelector('.otime');if(tt){const t=Math.max(0,Math.ceil(o.left));tt.textContent=`${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;}
-  el.classList.toggle('hurry',o.left<5&&!o.done);
+  const hurry=!o.result&&o.left<=ORDER_HURRY_SECONDS;
+  const failed=o.result==='failure';
+  const sprite=hurry||failed?'angry':o.result==='success'?'smile':'dot';
+  const face=el.querySelector('.cu');
+  if(face.dataset.sprite!==sprite){
+    face.innerHTML=npcImg(o.who,sprite);
+    face.dataset.sprite=sprite;
+  }
+  el.classList.toggle('hurry',hurry);
+  el.classList.toggle('failed',failed);
 }
 function orderMatched(t,sauced){
-  const o=L&&L.order;if(!o||o.done)return;
+  const o=L&&L.order;if(!o||o.result)return;
   const x=o.items.find(y=>y.t===t&&!!y.sauce===!!sauced&&y.got<y.need);if(!x)return;
-  x.got++;renderOrder();
+  x.got++;
   if(o.items.every(y=>y.got>=y.need))finishOrder(true);
+  else renderOrder();
 }
 function finishOrder(ok){
-  const o=L&&L.order;if(!o||o.done)return;o.done=true;
-  const el=$('#order'),cu=el.querySelector('.cu'),[x,y]=centerOf(el);
-  if(ok){const sets=o.items.reduce((a,q)=>a+q.need,0);let coins=20*sets+(o.deliv?20:0),hb=0;if(o.special)coins*=2;if(o.special&&D.hearts<MAXH){D.hearts++;hb=1;}D.coins+=coins;L.time+=8;save();updCoins();updLevelHud();if(cu)cu.innerHTML=npcImg(o.who,'smile');sparkle(x,y,10,'🪙');floatText(x,y+34,`주문 완료! 🪙+${coins}${hb?' ❤️+1':''} ⏰+8초`);sfx('ok');if(o.special)say(o.who,'ok');}
-  else{if(cu)cu.innerHTML=npcImg(o.who,'angry');floatText(x,y+34,'손님이 떠났어요…');sfx('err');if(o.special)say(o.who,'ng');}
+  const o=L&&L.order;if(!o||o.result)return;o.result=ok?'success':'failure';
+  const el=$('#order'),[x,y]=centerOf(el);
+  if(ok){const sets=o.items.reduce((a,q)=>a+q.need,0);let coins=20*sets+(o.deliv?20:0),hb=0;if(o.special)coins*=2;if(o.special&&D.hearts<MAXH){D.hearts++;hb=1;}D.coins+=coins;L.time+=8;save();updCoins();updLevelHud();sparkle(x,y,10,'🪙');floatText(x,y+34,`주문 완료! 🪙+${coins}${hb?' ❤️+1':''} ⏰+8초`);sfx('ok');if(o.special)say(o.who,'ok');}
+  else{floatText(x,y+34,'손님이 떠났어요…');sfx('err');if(o.special)say(o.who,'ng');}
   renderOrder();
   const me=L;
   const wait=o.special?1700:0;
