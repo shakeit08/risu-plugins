@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.21.47
+//@version 2.21.48
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -763,7 +763,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest };
 })();
-const VER = '2.21.47';
+const VER = '2.21.48';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest } = ART;
@@ -1468,7 +1468,7 @@ function newState() {
     v: 1, savedAt: 0, level: 1, xp: 0, coins: 30, energy: MAX_E, eTs: Date.now(),
     board, rows: START_ROWS, chains: ['bakery', 'coffee'], orders: [],
     disc: Object.fromEntries(CHAIN_KEYS.map(c => [c, c === 'bakery' || c === 'coffee' ? [1] : []])),
-    settings: { chatE: 3, sfx: 2, story: true, mhint: true }, story: { intro: false, seen: {} }, giftDay: '', shop: { day: '', buys: 0 }, mail: { list: [], got: {}, am: '', pm: '' }, tut: { k: 0, t: 0 },
+    settings: { chatE: 3, sfx: 2, story: true, mhint: true, bgm: true, bgmV: .5 }, story: { intro: false, seen: {} }, giftDay: '', shop: { day: '', buys: 0 }, mail: { list: [], got: {}, am: '', pm: '' }, tut: { k: 0, t: 0 },
     stats: { merges: 0, orders: 0, made: 0 }, pendingGens: [], pendingItems: [], gdisc: {}, chatBonus: 0, snow: 0, ev: null, onEv: false, evTab: false, coll: {}, pokes: { d: '', l: [] }, seenVer: '', street: {}, stBeat: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }, spin: { d: '' }, tools: { cut: 0, up: 0 }, tbuy: { d: '', cut: 0, up: 0 }, store: [], storeN: STORE_START, nextId: 1,
     stars: 0, decor: Object.fromEntries(ALL_SPOTS.map(d => [d.k, 0])), areaDone: {},
   };
@@ -1527,6 +1527,8 @@ function sanitize(o) {
   if (o.settings && [0, 1, 2, 3].includes(o.settings.sfx)) s.settings.sfx = o.settings.sfx;
   if (o.settings && typeof o.settings.story === 'boolean') s.settings.story = o.settings.story;
   if (o.settings && typeof o.settings.mhint === 'boolean') s.settings.mhint = o.settings.mhint;
+  if (o.settings && typeof o.settings.bgm === 'boolean') s.settings.bgm = o.settings.bgm;
+  if (o.settings && typeof o.settings.bgmV === 'number' && o.settings.bgmV >= 0 && o.settings.bgmV <= 1) s.settings.bgmV = o.settings.bgmV;
   if (o.settings && o.settings.evPreview) s.settings.evPreview = true;
   if (o.coll && typeof o.coll === 'object') for (const k in o.coll) if (o.coll[k]) s.coll[k] = true;
   s.evTab = !!o.evTab;
@@ -2687,6 +2689,7 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 .mc-mailw{max-height:60vh;overflow:auto;display:flex;flex-direction:column;gap:8px;margin:6px 0 10px;padding:2px}
 .ml-row{display:flex;align-items:center;gap:10px;background:#fffaf2;border:2px solid #e8cba8;border-radius:14px;padding:8px 10px}
 .ml-row.got{opacity:.6}
+.mc-vol{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:13px;font-weight:800;color:#8a6a5e}.mc-vol input{flex:1;accent-color:#ff7fa3;height:22px}.mc-vol b{min-width:28px;text-align:right;color:#5b3a32}
 .mc-board .c.mh{box-shadow:inset 0 0 0 2px rgba(255,170,200,.95),inset 0 0 10px rgba(255,190,215,.8)}
 .ml-fc{width:48px;height:48px;flex-shrink:0;border-radius:50%;overflow:hidden;background:#fff1d6;display:flex;align-items:center;justify-content:center}
 .ml-fc>img,.ml-fc>svg{width:100%;height:100%;object-fit:contain;display:block}
@@ -3161,6 +3164,45 @@ function ac() {
   if (actx.state === 'suspended') actx.resume().catch(() => { });
   return actx;
 }
+// ---------- 배경 음악: 주방 2곡을 번갈아, 마을 1곡. 곡이 끝날 때 부드럽게 이어 붙임 ----------
+const BGM_BASE = APP ? 'bgm/' : 'https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe_bgm/';
+const BGM_LIST = { cafe: ['cafe1.0c711031.mp3', 'cafe2.e5b77f07.mp3'], town: ['town1.ee1e87ef.mp3'] };
+const bgm = { cur: null, old: [], scene: '', idx: { cafe: 0, town: 0 }, timer: 0 };
+const bgmVol = () => (S && S.settings && S.settings.bgm !== false) ? (S.settings.bgmV ?? .5) * .8 : 0;
+function bgmSet(t) {
+  const v = Math.max(0, Math.min(1, t.f * bgmVol()));
+  if (t.g) t.g.gain.value = v; else { try { t.a.volume = v; } catch (_) { } }
+}
+function bgmApply() { if (bgm.cur) bgmSet(bgm.cur); bgm.old.forEach(bgmSet); }
+function bgmStart(scene) {
+  const L = BGM_LIST[scene], file = L[bgm.idx[scene] % L.length]; bgm.idx[scene]++;
+  const a = new Audio(); a.crossOrigin = 'anonymous'; a.preload = 'auto';
+  const t = { a, g: null, f: 0, to: 1, scene };
+  const c = ac();
+  if (c) { try { const n = c.createMediaElementSource(a); t.g = c.createGain(); t.g.gain.value = 0; n.connect(t.g).connect(c.destination); } catch (_) { t.g = null; } }
+  a.onerror = () => { const u = imgAlt(a.src); if (u && !t.alt) { t.alt = 1; a.src = u; a.play().catch(() => { }); } };
+  a.onended = () => { if (bgm.cur === t) bgmNext(); };
+  a.src = BGM_BASE + file;
+  bgmSet(t); a.play().catch(() => { });
+  return t;
+}
+function bgmNext() {
+  if (bgm.cur) { bgm.cur.to = 0; bgm.old.push(bgm.cur); }
+  bgm.cur = bgm.scene ? bgmStart(bgm.scene) : null;
+}
+function bgmTick(now) {
+  const want = (visible && !document.hidden && bgmVol() > 0) ? ($('.mc-town') ? 'town' : 'cafe') : '';
+  if (want !== bgm.scene) { bgm.scene = want; bgmNext(); }
+  const c = bgm.cur;
+  if (c && c.a.duration && c.a.duration - c.a.currentTime < 3.5 && !c.a.paused) bgmNext();
+  // 서서히 켜고 끄기 (약 1.5초)
+  const st = now === true ? .2 : .066;
+  [bgm.cur, ...bgm.old].forEach(t => { if (!t) return; t.f = t.to > t.f ? Math.min(t.to, t.f + st) : Math.max(t.to, t.f - st); bgmSet(t); });
+  bgm.old = bgm.old.filter(t => { if (t.f <= 0) { try { t.a.pause(); t.a.removeAttribute('src'); t.a.load(); } catch (_) { } return false; } return true; });
+}
+setInterval(bgmTick, 100);
+// 브라우저는 화면을 한 번 눌러야 소리를 내 줌: 누를 때 멈춰 있던 곡을 다시 재생
+document.addEventListener('pointerdown', () => { if (bgm.cur && bgm.cur.a.paused && bgm.scene) { ac(); bgm.cur.a.play().catch(() => { }); } }, true);
 function tone(f, t0, dur, type = 'sine', vol = .15, f2 = 0) {
   const v = VOLS[S && S.settings ? S.settings.sfx : 2];
   if (!v) return;
@@ -3756,6 +3798,9 @@ function openSettings() {
       <div class="mc-seg">${CHAT_E_OPTIONS.map(v => `<button class="mc-btn wh ${S.settings.chatE === v ? 'on' : ''}" data-ce="${v}">${v ? '+' + v : '끄기'}</button>`).join('')}</div></div>`}
     <div class="mc-sec"><h4>효과음</h4>
       <div class="mc-seg">${['끄기', '작게', '보통', '크게'].map((t, v) => `<button class="mc-btn wh ${S.settings.sfx === v ? 'on' : ''}" data-sfx="${v}">${t}</button>`).join('')}</div></div>
+    <div class="mc-sec"><h4>배경 음악</h4>
+      <div class="mc-seg"><button class="mc-btn wh ${S.settings.bgm !== false ? 'on' : ''}" data-bgm="1">켜기</button><button class="mc-btn wh ${S.settings.bgm !== false ? '' : 'on'}" data-bgm="0">끄기</button></div>
+      <div class="mc-vol"><span>음량</span><input type="range" min="0" max="100" step="5" value="${Math.round((S.settings.bgmV ?? .5) * 100)}" data-bgmv><b>${Math.round((S.settings.bgmV ?? .5) * 100)}</b></div></div>
     <div class="mc-sec"><h4>스토리 대사</h4>
       <div class="mc-seg"><button class="mc-btn wh ${S.settings.story ? 'on' : ''}" data-story="1">켜기</button><button class="mc-btn wh ${S.settings.story ? '' : 'on'}" data-story="0">끄기</button></div></div>
     <div class="mc-sec"><h4>머지 힌트 모션</h4><div class="mc-sub" style="margin-bottom:6px">합칠 수 있는 재료끼리 서로 끌어당겨요</div>
@@ -3789,6 +3834,12 @@ function openSettings() {
     if (r === 'start' && !S.story.seen.xmas_intro) { m.remove(); playStory('xmas_intro'); }
     else if (r && r.end) { m.remove(); toast(`크리스마스 판을 정리했어요 <span class="mc-mini">${UI.coin}+${r.gain}</span>`); }
   });
+  m.querySelectorAll('[data-bgm]').forEach(b => b.onclick = () => {
+    S.settings.bgm = b.dataset.bgm === '1'; save(); bgmTick(true);
+    m.querySelectorAll('[data-bgm]').forEach(x => x.classList.toggle('on', x === b));
+  });
+  const bv = m.querySelector('[data-bgmv]');
+  if (bv) { bv.oninput = () => { S.settings.bgmV = +bv.value / 100; bv.nextElementSibling.textContent = bv.value; bgmApply(); }; bv.onchange = () => { save(); bgmTick(true); }; }
   m.querySelectorAll('[data-mh]').forEach(b => b.onclick = () => {
     S.settings.mhint = b.dataset.mh === '1'; save(); applyPull(); idleKick();
     m.querySelectorAll('[data-mh]').forEach(x => x.classList.toggle('on', x === b));
