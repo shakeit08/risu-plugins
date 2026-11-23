@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.21.52
+//@version 2.21.54
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -763,7 +763,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest };
 })();
-const VER = '2.21.52';
+const VER = '2.21.54';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest } = ART;
@@ -795,6 +795,8 @@ const DECOR_TOTAL = DECOR.length * 2;
 const LOOK = [['낡은', '예쁜', '반짝이는'], ['낡은', '줄무늬', '전구 달린'], ['먼지 낀', '디저트', '커튼 단'], ['낡은', '민트색', '화환 단'], ['시든', '꽃이 핀', '풍성한'], ['꺼진', '불 켜진', '꽃바구니'], ['텅 빈', '아담한', '파라솔'], ['금 간', '크림색', '벽돌 장식']];
 DECOR.forEach((d, i) => { d.look = LOOK[i]; });
 const sp = (k, name, costs, look, desc) => ({ k, name, costs, look, desc });
+const CH5_COMPLETION_ENERGY = 80;
+const CH5_ENERGY_MAIL = 'd-ch5-completion-energy-v1';
 const AREAS = [
   { k: 'cafe', name: '달콤 카페', spots: DECOR, reward: { coins: 300, e: 50 }, perk: null, doneText: '낡은 가게가 동네에서 제일 예쁜 카페가 됐어요.' },
   { k: 'flower', name: '꽃집 봄날', reward: { coins: 400, e: 60 }, perk: '최대 에너지 +20', gen: 'tea', doneText: '거리에 꽃향기가 가득해졌어요.', spots: [
@@ -1010,7 +1012,7 @@ const AREAS = [
     sp('cbtrunk', '썰매 가방', [13, 22], ['없는', '가방 실은', '선물 쌓인'], ['썰매 위 여행 가방', '리본과 선물 상자']),
     sp('cblamp', '역 가로등', [13, 22], ['없는', '꺼진', '화환 단'], ['역 가로등', '반짝 불빛과 눈꽃 화환']),
   ] },
-  { k: 'parasol', ch: 5, name: '집게 파라솔 대여소', reward: { coins: 4800, e: 0 }, once: ['e', 50], perk: null, doneText: '알록달록 파라솔이 모래사장에 활짝 폈어요.', spots: [
+  { k: 'parasol', ch: 5, name: '집게 파라솔 대여소', reward: { coins: 4800, e: CH5_COMPLETION_ENERGY }, once: ['e', 50], perk: null, doneText: '알록달록 파라솔이 모래사장에 활짝 폈어요.', spots: [
     sp('pawall', '대여소', [18, 28], ['낡은', '새 나무', '산호 줄무늬'], ['새 나무로 고친 대여소', '산호색 줄무늬와 구명 튜브 장식']),
     sp('pawin', '대여 창구', [15, 25], ['판자 댄', '파라솔 접힌', '튜브 가득'], ['접힌 파라솔과 튜브', '줄무늬 파라솔과 오리 튜브']),
     sp('pasign', '간판', [14, 24], ['없는', '나무', '조개 장식'], ['파라솔 간판이 걸려요', '작은 파라솔과 조개 장식']),
@@ -1018,7 +1020,7 @@ const AREAS = [
     sp('paring', '튜브', [14, 23], ['없는', '하얀', '오리 얹은'], ['하얀 튜브 두 개', '알록달록 튜브와 오리']),
     sp('pachair', '접이식 의자', [14, 23], ['없는', '나무', '수건 걸친'], ['나무 접이식 의자', '줄무늬 수건과 선글라스']),
   ] },
-  { k: 'melon', ch: 5, name: '꿀꺽 수박 주스바', reward: { coins: 5000, e: 0 }, once: ['cut', 1], perk: null, doneText: '시원한 수박 주스 한 잔에 더위가 싹 가셔요.', spots: [
+  { k: 'melon', ch: 5, name: '꿀꺽 수박 주스바', reward: { coins: 5000, e: CH5_COMPLETION_ENERGY }, once: ['cut', 1], perk: null, doneText: '시원한 수박 주스 한 잔에 더위가 싹 가셔요.', spots: [
     sp('wmwall', '주스바', [18, 28], ['찢어진', '새 초가', '수박 무늬'], ['새 초가지붕과 대나무 벽', '수박 줄무늬 벽과 수박 장식']),
     sp('wmwin', '판매대', [15, 25], ['판자 댄', '믹서 놓인', '수박 가득'], ['믹서와 주스 컵', '수박과 우산 꽂은 주스']),
     sp('wmsign', '간판', [14, 24], ['없는', '나무', '수박 모양'], ['주스 간판이 걸려요', '수박 조각 모양 간판']),
@@ -1026,7 +1028,7 @@ const AREAS = [
     sp('wmstool', '바 의자', [14, 23], ['없는', '대나무', '방석 깐'], ['대나무 바 의자', '분홍 방석과 코코넛 주스']),
     sp('wmplant', '야자 화분', [14, 23], ['없는', '새싹', '전구 감은'], ['작은 야자 새싹', '줄무늬 화분과 꼬마 전구']),
   ] },
-  { k: 'shell', ch: 5, name: '또르 조개 기념품점', reward: { coins: 5200, e: 0 }, once: ['up', 1], perk: null, doneText: '반짝이는 조개 기념품이 창가에 가득해요.', spots: [
+  { k: 'shell', ch: 5, name: '또르 조개 기념품점', reward: { coins: 5200, e: CH5_COMPLETION_ENERGY }, once: ['up', 1], perk: null, doneText: '반짝이는 조개 기념품이 창가에 가득해요.', spots: [
     sp('slwall', '기념품점', [18, 28], ['따개비 붙은', '하얀', '라벤더색'], ['하얀 벽과 조개 지붕', '라벤더 벽과 민트 테두리']),
     sp('slwin', '동그란 창', [15, 25], ['깨진', '조개 놓인', '진주 장식'], ['조개 세 개 놓인 창', '진주 목걸이와 병 속 배']),
     sp('slsign', '간판', [14, 24], ['없는', '조개 모양', '진주 테두리'], ['조개 간판이 걸려요', '분홍 조개와 불가사리']),
@@ -1034,7 +1036,7 @@ const AREAS = [
     sp('sltable', '진열 탁자', [14, 23], ['없는', '나무', '풍경 단'], ['작은 나무 탁자', '민트 식탁보와 조개 풍경']),
     sp('slrack', '엽서 꽂이', [14, 23], ['없는', '빈', '엽서 가득'], ['철사 엽서 꽂이', '바다 그림 엽서 가득']),
   ] },
-  { k: 'surf', ch: 5, name: '느릿 서핑 숍', reward: { coins: 5400, e: 0 }, once: ['bag', 2], perk: null, doneText: '파도 무늬 서핑보드가 줄지어 손님을 기다려요.', spots: [
+  { k: 'surf', ch: 5, name: '느릿 서핑 숍', reward: { coins: 5400, e: CH5_COMPLETION_ENERGY }, once: ['bag', 2], perk: null, doneText: '파도 무늬 서핑보드가 줄지어 손님을 기다려요.', spots: [
     sp('sfwall', '서핑 숍', [18, 28], ['부서진', '나무', '청록색'], ['나무 벽과 하얀 서핑보드', '청록 벽과 노란 서핑보드']),
     sp('sfwin', '진열창', [15, 25], ['깨진', '보드 두 개', '보드 가득'], ['하얀 보드 두 개', '파도 무늬 보드와 잠수복']),
     sp('sfsign', '간판', [14, 24], ['없는', '나무 보드', '히비스커스'], ['서핑보드 간판이 서요', '노란 보드와 히비스커스']),
@@ -1042,7 +1044,7 @@ const AREAS = [
     sp('sfshower', '샤워대', [14, 23], ['없는', '나무', '수건 건'], ['나무 샤워대', '줄무늬 수건과 꽃']),
     sp('sfbench', '벤치', [14, 23], ['없는', '나무', '꽃목걸이 건'], ['나무 벤치', '꽃목걸이와 조리']),
   ] },
-  { k: 'castle', ch: 5, name: '끼룩 모래성 공방', reward: { coins: 5600, e: 0 }, once: ['e', 50], perk: null, doneText: '깃발 꽂은 모래성 공방에 아이들 웃음소리가 들려요.', spots: [
+  { k: 'castle', ch: 5, name: '끼룩 모래성 공방', reward: { coins: 5600, e: CH5_COMPLETION_ENERGY }, once: ['e', 50], perk: null, doneText: '깃발 꽂은 모래성 공방에 아이들 웃음소리가 들려요.', spots: [
     sp('scwall', '모래성 공방', [18, 28], ['무너진', '매끈한', '조개 박힌'], ['매끈한 모래성 벽', '조개 장식과 파란 깃발']),
     sp('scwin', '아치 창', [15, 25], ['깨진', '모래성 두 개', '모래성 가득'], ['작은 모래성 모형', '깃발 단 모래성과 양동이']),
     sp('scsign', '깃발 간판', [14, 24], ['없는', '하얀 천', '파란 천'], ['천 간판이 걸려요', '파란 천과 불가사리']),
@@ -1050,7 +1052,7 @@ const AREAS = [
     sp('scsand', '모래성', [14, 23], ['없는', '작은', '탑 높은'], ['작은 모래성', '탑과 깃발 단 큰 모래성']),
     sp('sccart', '외바퀴 수레', [14, 23], ['없는', '모래 실은', '꽃 실은'], ['모래 실은 수레', '불가사리와 꽃, 깃발']),
   ] },
-  { k: 'yacht', ch: 5, name: '흰 돛 요트 선착장', reward: { coins: 6000, e: 0 }, perk: '주문 코인 +5%', doneText: '흰 돛 요트가 출항 준비를 마쳤어요. 햇살 모래사장 완성! 5장 완성!', spots: [
+  { k: 'yacht', ch: 5, name: '흰 돛 요트 선착장', reward: { coins: 6000, e: CH5_COMPLETION_ENERGY }, perk: '주문 코인 +5%', doneText: '흰 돛 요트가 출항 준비를 마쳤어요. 햇살 모래사장 완성! 5장 완성!', spots: [
     sp('ytwall', '항구 사무소', [19, 29], ['낡은', '하얀', '남색 지붕'], ['하얀 벽과 망루', '남색 지붕과 금빛 닻']),
     sp('ytwin', '매표 창구', [15, 25], ['판자 댄', '종 놓인', '바다 지도'], ['작은 종이 놓인 창구', '바다 지도와 구명 튜브']),
     sp('ytsign', '간판', [14, 24], ['없는', '밧줄 테', '남색'], ['밧줄 테 간판이 걸려요', '남색 간판과 금빛 별']),
@@ -1468,7 +1470,7 @@ function newState() {
     v: 1, savedAt: 0, level: 1, xp: 0, coins: 30, energy: MAX_E, eTs: Date.now(),
     board, rows: START_ROWS, chains: ['bakery', 'coffee'], orders: [],
     disc: Object.fromEntries(CHAIN_KEYS.map(c => [c, c === 'bakery' || c === 'coffee' ? [1] : []])),
-    settings: { chatE: 3, sfx: 2, story: true, mhint: true, bgm: true, bgmV: .5 }, story: { intro: false, seen: {} }, giftDay: '', shop: { day: '', buys: 0 }, mail: { list: [], got: {}, am: '', pm: '' }, tut: { k: 0, t: 0 },
+    settings: { chatE: 3, sfx: 2, story: true, mhint: true, bgm: true, bgmV: .5 }, story: { intro: false, seen: {} }, giftDay: '', shop: { day: '', buys: 0 }, mail: { list: [], got: { [CH5_ENERGY_MAIL]: 1 }, am: '', pm: '' }, tut: { k: 0, t: 0 },
     stats: { merges: 0, orders: 0, made: 0 }, pendingGens: [], pendingItems: [], gdisc: {}, chatBonus: 0, snow: 0, ev: null, onEv: false, evTab: false, coll: {}, pokes: { d: '', l: [] }, seenVer: '', street: {}, stBeat: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }, spin: { d: '' }, tools: { cut: 0, up: 0 }, tbuy: { d: '', cut: 0, up: 0 }, store: [], storeN: STORE_START, nextId: 1,
     stars: 0, decor: Object.fromEntries(ALL_SPOTS.map(d => [d.k, 0])), areaDone: {},
   };
@@ -1567,6 +1569,16 @@ function sanitize(o) {
     s.ev = ev;
   }
   autoClear(s);
+  if (!o.mail?.got?.[CH5_ENERGY_MAIL] && !s.mail.list.some(letter => letter.id === CH5_ENERGY_MAIL)) {
+    const completed = AREAS.filter(area => area.ch === 5 && s.areaDone[area.k]).length;
+    if (completed) {
+      mailPush({
+        id: CH5_ENERGY_MAIL, k: 'd', a: -1, from: '제작자', ti: '햇살 모래사장 보상',
+        t: `햇살 모래사장 가게 완성 보상을 조정했어요. 먼저 완성해 주신 가게 ${completed}곳에 대해 한 곳당 에너지 ${CH5_COMPLETION_ENERGY}을 보내드려요. 함께 꾸며 주셔서 고마워요!`,
+        rw: mailRw({ e: completed * CH5_COMPLETION_ENERGY }),
+      }, s);
+    }
+  }
   return s;
 }
 
@@ -3626,6 +3638,10 @@ function toast(html, opt = {}) {
   setTimeout(() => { t.animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(-8px)' }], { duration: 250 }).onfinish = () => t.remove(); }, opt.ms || 2600);
 }
 const NOTES = [
+  ['2.21.54', [
+    '햇살 모래사장 가게를 완성하면 가게마다 에너지를 80 더 받아요.',
+    '이미 완성한 햇살 모래사장 가게의 추가 에너지 보상은 제작자 우편으로 한 번 보내드려요.',
+  ]],
   ['2.21.49', [
     '저장이 겹쳐도 이전 진행 상황이 덮어쓰지 않도록 고쳤어요. 저장에 실패하면 다음 저장 요청에서 다시 시도해요.',
     '보관함에서 물건을 꺼내면 빈칸이 채워져요. 자동정렬을 누르면 같은 종류끼리 모아 정리할 수 있어요.',
@@ -5221,10 +5237,14 @@ const LETTERS = {
   flamingo: ['분홍 파르페를 보면 제 생각 나죠?', '축제 때 쓸 사탕 화관을 미리 만들어 뒀어요.'],
 };
 const mailUnread = () => S && S.mail ? S.mail.list.filter(x => !x.got).length : 0;
-function mailPush(x) {
-  const L = S.mail.list; L.unshift(Object.assign({ at: Date.now(), got: false }, x));
-  // 너무 많아지면 받은 편지부터, 그다음 오래된 편지부터 정리
-  while (L.length > MAIL_MAX) { let k = L.map(y => y.got).lastIndexOf(true); if (k < 0) k = L.length - 1; L.splice(k, 1); }
+function mailPush(x, state = S) {
+  const L = state.mail.list; L.unshift(Object.assign({ at: Date.now(), got: false }, x));
+  // 보상 우편은 수령할 때까지 보관하고, 나머지는 받은 편지부터 정리
+  while (L.length > MAIL_MAX) {
+    const claimed = L.map(letter => letter.got).lastIndexOf(true);
+    const oldest = claimed >= 0 ? claimed : L.map(letter => letter.id !== CH5_ENERGY_MAIL).lastIndexOf(true);
+    L.splice(oldest, 1);
+  }
 }
 // 지금까지 만난 주민 (지나간 마을 주민일수록 자주 편지를 보냄)
 function mailWriter() {
