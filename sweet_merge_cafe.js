@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.21.58
+//@version 2.21.59
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -781,7 +781,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, XMAS_CHAINS, XMAS_ART, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest };
 })();
-const VER = '2.21.58';
+const VER = '2.21.59';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, XMAS_CHAINS, XMAS_ART, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest } = ART;
@@ -3843,6 +3843,10 @@ function toast(html, opt = {}) {
   setTimeout(() => { t.animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(-8px)' }], { duration: 250 }).onfinish = () => t.remove(); }, opt.ms || 2600);
 }
 const NOTES = [
+  ['2.21.59', [
+    '시즌이 열리면 1~6장 어느 지도에서든 가운데 마을 광장을 누르거나 목록에서 선택해 들어갈 수 있어요.',
+    '꾸민 광장과 모아 둔 눈송이는 어느 지도에서든 이어져요. 광장을 나가면 들어왔던 지도로 돌아와요.',
+  ]],
   ['2.21.56', [
     '반짝 바닷가 마을 6장 「하얀 항구」가 열렸어요! 햇살 모래사장을 다 꾸미면 갈 수 있어요.',
     '새 가게 6곳과 새 이웃 몽돌·또박·뽀글·문문·훨훨·첨벙이 기다리고 있어요. 분홍 조개 초대장의 비밀도 조금 더 밝혀져요.',
@@ -4649,7 +4653,7 @@ function renderTown(first) {
   const sc = v.querySelector('.tw-scroll'), st = v.querySelector('.tw-street');
   stPos = {};
   const ST = STREET[townCh], lots = chLots(townCh), nG = lots.length + 1;
-  const CA = AREAS.filter(A => chOf(A) === townCh && (!A.event || areaOpen(AREAS.indexOf(A))));
+  const chapterAreas = AREAS.filter((A, i) => A.event ? areaOpen(i) : chOf(A) === townCh);
   const shopN = lots.reduce((s, A) => s + areaCount(A), 0), shopT = lots.reduce((s, A) => s + A.spots.length * 2, 0);
   const tot = shopT + ST.length * 3, dn = shopN + stDone(townCh);
   const nx = nextTask(townCh);
@@ -4670,9 +4674,8 @@ function renderTown(first) {
   });
   addGap(0);
   AREAS.forEach((A, i) => {
-    if (chOf(A) !== townCh) return;
+    if (!chapterAreas.includes(A)) return;
     const open = areaOpen(i);
-    if (A.event && !open) return;
     const L = Object.fromEntries(A.spots.map(d => [d.k, S.decor[d.k] || 0]));
     const t = (open && townLot(A.k, L)) || townFence(A.name);
     const [lx, ly, lw, lh] = t.lot, kf = (open ? (A.k === 'station' ? 1.19 : 1) : .72) * .5 / 880;
@@ -4825,10 +4828,10 @@ function renderTown(first) {
       const P0 = townLot(o.A.k, Object.fromEntries(o.A.spots.map(d => [d.k, S.decor[d.k] || 0])));
       if (P0) {
         const [lx, ly, lw, lh] = P0.lot, fy = P0.ground - 70, sc = (RX - PW / 2 - .02 * u) / 620;
-        objs.push({ h: `<button class="tw-lot" data-tw="lot" data-i="${o.i}" style="left:${(cx - (750 - lx) * sc).toFixed(1)}px;top:${(cy - (fy - ly) * sc).toFixed(1)}px;width:${(lw * sc).toFixed(1)}px;height:${(lh * sc).toFixed(1)}px;z-index:${Math.round(cy * 10)}">${P0.svg}</button>` });
+        objs.push({ h: `<button class="tw-lot" data-tw="lot" data-i="${o.i}" aria-label="${esc(o.A.name)}" title="${esc(o.A.name)}" style="left:${(cx - (750 - lx) * sc).toFixed(1)}px;top:${(cy - (fy - ly) * sc).toFixed(1)}px;width:${(lw * sc).toFixed(1)}px;height:${(lh * sc).toFixed(1)}px;z-index:${Math.round(cy * 10)}">${P0.svg}</button>` });
       } else {
         const pw = o.wf * u;
-        objs.push({ h: `<button class="tw-lot" data-tw="lot" data-i="${o.i}" style="left:${(cx - pw / 2).toFixed(1)}px;top:${(cy + .1 * u - o.up * u).toFixed(1)}px;width:${pw.toFixed(1)}px;height:${(o.hf * u).toFixed(1)}px;z-index:${Math.round(cy * 10)}">${o.svg}</button>` });
+        objs.push({ h: `<button class="tw-lot" data-tw="lot" data-i="${o.i}" aria-label="${esc(o.A.name)}" title="${esc(o.A.name)}" style="left:${(cx - pw / 2).toFixed(1)}px;top:${(cy + .1 * u - o.up * u).toFixed(1)}px;width:${pw.toFixed(1)}px;height:${(o.hf * u).toFixed(1)}px;z-index:${Math.round(cy * 10)}">${o.svg}</button>` });
       }
       centers[o.i] = { x: cx, y: cy - o.up * u * .4, cx, base: cy, u };
       foot.push([cx - RX, cy - RY, cx + RX, cy + RY]); bodies.push([cx - RX * .8, cy - o.up * u, cx + RX * .8, cy + RY]);
@@ -4931,7 +4934,7 @@ function renderTown(first) {
     kinds.slice(0, nA).forEach((ix, n) => lanes[n % lanes.length].kinds.push(ix));
   }
   v.querySelector('.tw-list').innerHTML = AREAS.map((A, i) => {
-    if (!CA.includes(A)) return '';
+    if (!chapterAreas.includes(A)) return '';
     const open = areaOpen(i), n = areaCount(A), tot = A.spots.length * 2, ok = done(A.k);
     const st = ok ? '완성 ✓' : open ? `${n}/${tot}` : '잠김';
     return `<button class="tw-card ${open ? '' : 'lk'} ${ok ? 'ok' : ''}" data-tw="lot" data-i="${i}"><div class="tx"><b>${open ? '' : `<i class="lk">${UI.lock}</i>`}${esc(A.name)}</b><span class="mc-sub">${[A.perk && esc(A.perk), A.gen && `생산기 ${esc(CHAINS[A.gen].gen)}`].filter(Boolean).join(' · ')}</span></div><div class="pg"><span>${st}</span><div class="bar"><i style="width:${(100 * n / tot).toFixed(0)}%"></i></div></div></button>`;
@@ -5285,10 +5288,12 @@ function renderCafe(anim) {
   const A = AREAS[curArea], open = areaOpen(curArea);
   v.querySelector('.cf-st .v').textContent = S[curOf(A)];
   v.querySelector('.cf-st .ic').innerHTML = A.event ? SNOW : UI.star;
+  const chapter = A.event && $('.mc-town') ? townCh : chOf(A);
   const sx = v.querySelector('.cf-strip').scrollLeft;
   v.querySelector('.cf-strip').innerHTML = AREAS.map((a, i) => {
-    if (chOf(a) !== chOf(A)) return '';
-    const op = areaOpen(i), full = op && areaFull(a);
+    const op = areaOpen(i);
+    if (chOf(a) !== chapter && !(a.event && op)) return '';
+    const full = op && areaFull(a);
     return `<button class="cf-tab ${i === curArea ? 'on' : ''}" data-cf="area" data-i="${i}">
       <div class="th">${op ? areaScene(a.k, S.decor) : lockedScene(a.name)}</div>
       <div class="nm">${op ? '' : `<i>${UI.lock}</i>`}${esc(a.name)}${full ? ' ✓' : ''}</div></button>`;
