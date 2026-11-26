@@ -1,7 +1,7 @@
 //@name risu_sizzle_pocha
 //@display-name 지글지글 포장마차
 //@api 3.0
-//@version 2.6.5
+//@version 2.6.6
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/risu_sizzle_pocha.js
 /*
  * 채팅 중 가볍게 하는 분식 꼬치 정렬 퍼즐 (푸디 시즐 스타일).
@@ -1285,7 +1285,7 @@ $('#bookBack').onclick=()=>{sfx('tap');$('#book').classList.add('hidden');};
 let armed=false;
 $('#resetAll').onclick=e=>{
   if(!armed){armed=true;e.currentTarget.textContent='한 번 더 누르면 초기화';e.currentTarget.style.background='#ff5a5f';setTimeout(()=>{armed=false;const b=$('#resetAll');if(b){b.textContent='진행 초기화';b.style.background='';}},3000);return;}
-  armed=false;Object.assign(D,{met:{},tips:{},hearts:MAXH,lvl:1,coins:300,boost:{hint:3,shuffle:2,bag:1,time:2},menuSeen:4});save();showMenu();e.currentTarget.textContent='진행 초기화';e.currentTarget.style.background='';
+  armed=false;Object.assign(D,{tips:{},hearts:MAXH,lvl:1,coins:300,boost:{hint:3,shuffle:2,bag:1,time:2},menuSeen:4});save();showMenu();e.currentTarget.textContent='진행 초기화';e.currentTarget.style.background='';
 };
 function updSnd(){$('#snd').textContent=D.mute?'🔇':'♪';}
 $('#snd').onclick=()=>{D.mute=!D.mute;updSnd();save();if(!D.mute)sfx('tap');};
