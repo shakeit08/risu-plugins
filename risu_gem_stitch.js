@@ -1,7 +1,7 @@
 //@name risu_gem_stitch
 //@display-name 보석 십자수
 //@api 3.0
-//@version 1.3.0
+//@version 1.3.1
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/risu_gem_stitch.js
 /*
  * 채팅 중 가볍게 하는 보석 십자수 정리 퍼즐 (Jewel Coloring 스타일). 도안은 계속 추가, 단계별 자동 저장.
@@ -81,7 +81,8 @@ const lighten=(c,a)=>mix(c,'#ffffff',a),darken=(c,a)=>mix(c,'#000000',a);
 const api=typeof risuai!=='undefined'?risuai:typeof Risuai!=='undefined'?Risuai:null;if(!api)return;
 (async()=>{
  let data={cur:'s1',rec:{},lv:1};
- try{const raw=await api.pluginStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);if(d&&d.rec&&typeof d.rec==='object'){data.rec=d.rec;data.mute=!!d.mute;if(STAGES.some(s=>s.id===d.cur))data.cur=d.cur;data.lv=Number.isInteger(d.lv)&&d.lv>0?d.lv:STAGES.findIndex(s=>s.id===data.cur)+1;data.lv=Math.min(data.lv,STAGES.length+1);if(data.lv<=STAGES.length){const want=STAGES[data.lv-1].id;if(data.cur!==want){data.cur=want;if(data.rec[want]?.done)delete data.rec[want];}}else data.cur=STAGES[STAGES.length-1].id;data.col=Array.isArray(d.col)?d.col.filter(q=>q&&Number.isInteger(q.lv)&&STAGES.some(s=>s.id===q.id)):STAGES.map((s,k)=>d.rec[s.id]?.done?{lv:k+1,id:s.id}:null).filter(Boolean);}}}catch(e){console.warn('[보석 십자수]',e);}
+ function useSave(d){if(!(d&&d.rec&&typeof d.rec==='object'&&!Array.isArray(d.rec)))return false;data.rec=d.rec;data.mute=!!d.mute;if(STAGES.some(s=>s.id===d.cur))data.cur=d.cur;data.lv=Number.isInteger(d.lv)&&d.lv>0?d.lv:STAGES.findIndex(s=>s.id===data.cur)+1;data.lv=Math.min(data.lv,STAGES.length+1);if(data.lv<=STAGES.length){const want=STAGES[data.lv-1].id;if(data.cur!==want){data.cur=want;if(data.rec[want]?.done)delete data.rec[want];}}else data.cur=STAGES[STAGES.length-1].id;data.col=Array.isArray(d.col)?d.col.filter(q=>q&&Number.isInteger(q.lv)&&STAGES.some(s=>s.id===q.id)):STAGES.map((s,k)=>d.rec[s.id]?.done?{lv:k+1,id:s.id}:null).filter(Boolean);if(Number.isInteger(d.metaSeen))data.metaSeen=d.metaSeen;return true;}
+ try{const raw=await api.pluginStorage.getItem(KEY);if(raw)useSave(JSON.parse(raw));}catch(e){console.warn('[보석 십자수]',e);}
  let st=null,S=null,hist=[],visible=false,folded=false,size=0,disposed=false,saveT=0,page=0,winT=0;
  let hintC=null,hintT=-1e9,selCv=null,shineT=-1e9,shineBig=0,selG=null,selI=-1,selT=-1,cs=10,ox=0,oy=0,cs0=10,ox0=0,oy0=0,dpr=1,boardDirty=true,raf=0,view={z:1,px:0,py:0};
  const landing=new Map(),pend=new Map(),departing=new Map(),ghostT=new Map(),flights=[],sprites=new Map();let holes=[];
@@ -139,8 +140,9 @@ header button{width:30px;height:30px;border-radius:10px;background:#fff;color:#8
 #menu[hidden]{display:none}
 #logoCv{width:min(320px,86%);aspect-ratio:320/104;margin-top:30px;flex:none}
 .hole{transition:opacity .4s}.hole.lock{opacity:.55;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='33,7 67,7 93,33 93,67 67,93 33,93 7,67 7,33' fill='none' stroke='%23d9a072' stroke-width='5' stroke-dasharray='9 7'/%3E%3C/svg%3E") center/100% 100% no-repeat}
-#colBtn{position:absolute;right:14px;bottom:18px;height:48px;padding:0 12px;flex-direction:column;justify-content:center;gap:0;font-size:12px;line-height:1.1}#colBtn b{font-size:20px}
+#colBtn{position:absolute;right:14px;bottom:18px;height:48px;padding:0 12px;flex-direction:column;justify-content:center;gap:0;font-size:12px;line-height:1.1}#colBtn b{font-size:20px}#setBtn{position:absolute;left:14px;bottom:18px;height:48px;padding:0 12px;flex-direction:column;justify-content:center;gap:0;font-size:12px;line-height:1.1}#setBtn b{font-size:20px}
 #col{z-index:25;inset:0;padding:12px 14px;overflow-y:auto;overflow-x:hidden}#col[hidden]{display:none}
+#set{z-index:25;inset:0;padding:12px 14px;overflow-y:auto;overflow-x:hidden}#set[hidden]{display:none}.setBox{display:flex;flex-direction:column;gap:10px;max-width:360px;margin:0 auto}.setBox h3{margin:0;font-size:15px;font-weight:900;color:#6f6aa8}.setBox .btn{justify-content:center}#svText{width:100%;box-sizing:border-box;height:120px;resize:none;border:0;border-radius:14px;padding:10px;font:12px/1.4 ui-monospace,monospace;color:#4a4470;background:#fff;box-shadow:inset 0 0 0 2px #e4e0f5;word-break:break-all}#svMsg{margin:0;min-height:18px;font-size:13px;font-weight:700;color:#8b5cf6;text-align:center}
 .chead{display:flex;align-items:center;gap:10px;margin-bottom:16px}.chead h2{flex:1;margin:0;font-size:24px;font-weight:900;color:#8b5cf6;text-align:center;padding-right:44px}
 .cgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:26px 20px;padding:8px 10px 24px}
 .ccard{background:#fff;border-radius:14px;padding:8px 8px 18px;box-shadow:0 0 0 5px #f4b25d,0 0 0 7px #e0913d,0 5px 0 7px #c77a2c;position:relative}
@@ -160,7 +162,7 @@ header button{width:30px;height:30px;border-radius:10px;background:#fff;color:#8
 <main id="main"><div class="stage" id="stage"><canvas id="board"></canvas><div id="win" hidden><div class="card"><div><h3>✨ 완성!</h3><p id="winsub"></p></div><div class="row"><button class="btn green" id="w-next">다음 단계 ›</button></div></div></div></div>
 <div class="trayBox" id="trayBox"><div id="tray"></div><div class="trayFoot"><span id="trayTip">보관함</span><span id="cap"></span></div></div>
 <div class="bar"><button class="btn" id="menuBtn">☰ 메인</button><button class="btn" id="reset">⟳ 다시</button><button class="btn" id="hint">💡 힌트</button></div></main>
-</section><section class="overlay" id="menu" hidden><canvas id="logoCv"></canvas><div class="metaWrap"><canvas id="metaCv"></canvas><button class="btn green" id="metaNext" hidden>›</button></div><button class="btn green play" id="go"></button><button class="btn" id="colBtn"><b>🖼</b>수집</button></section><section class="overlay" id="col" hidden><div class="chead"><button class="btn" id="colBack">◀</button><h2>수집</h2></div><div class="cgrid" id="cgrid"></div></section><canvas id="fx"></canvas>`;
+</section><section class="overlay" id="menu" hidden><canvas id="logoCv"></canvas><div class="metaWrap"><canvas id="metaCv"></canvas><button class="btn green" id="metaNext" hidden>›</button></div><button class="btn green play" id="go"></button><button class="btn" id="setBtn"><b>⚙</b>설정</button><button class="btn" id="colBtn"><b>🖼</b>수집</button></section><section class="overlay" id="set" hidden><div class="chead"><button class="btn" id="setBack">◀</button><h2>설정</h2></div><div class="setBox"><h3>세이브 코드</h3><button class="btn green" id="svCopy">세이브 코드 복사</button><textarea id="svText" spellcheck="false" placeholder="세이브 코드를 여기에 붙여 넣으세요"></textarea><button class="btn" id="svLoad">세이브 코드 불러오기</button><p id="svMsg"></p></div></section><section class="overlay" id="col" hidden><div class="chead"><button class="btn" id="colBack">◀</button><h2>수집</h2></div><div class="cgrid" id="cgrid"></div></section><canvas id="fx"></canvas>`;
  const $=id=>document.getElementById(id),canvas=$('board'),ctx=canvas.getContext('2d'),fx=$('fx'),fctx=fx.getContext('2d');
  const shakeTray=()=>$('trayBox').animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],{duration:200});
  // 저장 줄이기: 다 깬 단계는 지금 보고 있는 단계만 빼고 '완료' 표시만 남김
@@ -334,7 +336,25 @@ header button{width:30px;height:30px;border-radius:10px;background:#fff;color:#8
   if(!list.length)g.innerHTML='<div class="cempty" style="grid-column:1/-1">아직 완성한 그림이 없어요</div>';
   for(const q of list){const s=STAGES.find(x=>x.id===q.id);if(!s)continue;const card=document.createElement('div');card.className='ccard';card.append(colPic(s));const lb=document.createElement('span');lb.textContent=`단계 ${q.lv}`;card.append(lb);g.append(card);}
   $('col').hidden=false;$('col').scrollTop=0;}
- $('colBtn').onclick=showCol;$('colBack').onclick=()=>{$('col').hidden=true;};let waitT=0;$('go').onclick=()=>{if(data.lv>STAGES.length){pixLabel($('go'),'새 도안 준비 중');clearTimeout(waitT);waitT=setTimeout(()=>pixLabel($('go'),'준비 중'),1600);return;}$('menu').hidden=true;layout();render();};
+ $('colBtn').onclick=showCol;
+ // 세이브 코드: 진행 상황(하던 판 포함)을 글자로 내보내고 들여옴
+ const b64e=u=>{let t='';for(let i=0;i<u.length;i+=32768)t+=String.fromCharCode.apply(null,u.subarray(i,i+32768));return btoa(t).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');};
+ const b64d=t=>{t=t.replace(/-/g,'+').replace(/_/g,'/');while(t.length%4)t+='=';const b=atob(t),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;};
+ async function pipeBytes(u,stream){return new Uint8Array(await new Response(new Blob([u]).stream().pipeThrough(stream)).arrayBuffer());}
+ async function makeCode(){data.cur=st.id;data.rec[st.id]=S;const u=new TextEncoder().encode(JSON.stringify(slim(data)));
+  if(typeof CompressionStream==='function'){try{return 'GEM1z.'+b64e(await pipeBytes(u,new CompressionStream('deflate-raw')));}catch(e){}}return 'GEM1j.'+b64e(u);}
+ async function readCode(t){t=String(t||'').replace(/\s+/g,'');const m=/^GEM1([zj])\.([A-Za-z0-9_-]+)$/.exec(t);if(!m)throw new Error('bad');let u=b64d(m[2]);
+  if(m[1]==='z'){if(typeof DecompressionStream!=='function')throw new Error('nozip');u=await pipeBytes(u,new DecompressionStream('deflate-raw'));}return JSON.parse(new TextDecoder().decode(u));}
+ const svMsg=t=>{$('svMsg').textContent=t;};
+ $('setBtn').onclick=()=>{svMsg('');$('svText').value='';$('set').hidden=false;};$('setBack').onclick=()=>{$('set').hidden=true;};
+ $('svCopy').onclick=async()=>{try{const code=await makeCode();const ta=$('svText');ta.value=code;let ok=false;try{await navigator.clipboard.writeText(code);ok=true;}catch(e){}
+  if(!ok){try{ta.focus();ta.select();ok=document.execCommand('copy');}catch(e){}}svMsg(ok?'복사했어요':'칸의 글자를 길게 눌러 복사해 주세요');}catch(e){svMsg('코드를 만들지 못했어요');}};
+ $('svLoad').onclick=async()=>{let d;try{d=await readCode($('svText').value);}catch(e){svMsg(e.message==='nozip'?'이 기기에서는 이 코드를 열 수 없어요':'세이브 코드가 올바르지 않아요');return;}
+  if(!(d&&d.rec&&typeof d.rec==='object'&&!Array.isArray(d.rec))){svMsg('세이브 코드가 올바르지 않아요');return;}
+  if(!confirm('지금 진행 상황을 이 세이브 코드로 바꿀까요?'))return;const keep=JSON.stringify(slim(data));
+  try{data.rec={};data.col=[];if(!useSave(d))throw new Error('bad');await flush();loadStage(data.cur);sndUI();$('set').hidden=true;showMenu();}
+  catch(e){try{useSave(JSON.parse(keep));loadStage(data.cur);}catch(_){}svMsg('불러오지 못했어요');}};
+ $('colBack').onclick=()=>{$('col').hidden=true;};let waitT=0;$('go').onclick=()=>{if(data.lv>STAGES.length){pixLabel($('go'),'새 도안 준비 중');clearTimeout(waitT);waitT=setTimeout(()=>pixLabel($('go'),'준비 중'),1600);return;}$('menu').hidden=true;layout();render();};
  function after(){const k=st.pal.length;for(let c=0;c<k;c++){if(S.full.includes(c))continue;if(st.T.every((t,i)=>t!==c||S.board[i]===c)){S.full.push(c);S.cap=Math.min(MAXCAP,S.cap+COLS);chime([784,988,1319],90);shineT=performance.now()+650;renderTray();}}
   save();renderTop();boardDirty=true;kick();
   if(!S.done&&st.T.every((t,i)=>t<0||S.board[i]===t)){S.done=true;shineT=performance.now()+250;setTimeout(()=>chime([784,988,1175,1568,2093],95),300);shineBig=1;data.col=data.col||[];if(!data.col.some(q=>q.lv===data.lv))data.col.push({lv:data.lv,id:st.id});save();renderTray();winT=setTimeout(()=>{$('winsub').textContent=`단계 ${data.lv}`;$('w-next').textContent='다음 ›';$('win').hidden=false;},900);}}
@@ -377,7 +397,7 @@ header button{width:30px;height:30px;border-radius:10px;background:#fff;color:#8
  async function open(){if(disposed)return;visible=true;folded=false;updWin();await popup.open(opts());showMenu();requestAnimationFrame(()=>{layout();render();});}
  function close(){visible=false;void flush();return popup.close();}
  $('close').onclick=close;$('fold').onclick=()=>{folded=!folded;updWin();void flush();void popup.layout(opts());};$('size').onclick=()=>{size=(size+1)%3;folded=false;updWin();void popup.layout(opts());};
- const onKey=e=>{if(!visible||e.key!=='Escape')return;if(!$('col').hidden)$('col').hidden=true;else if(selG||selT>=0)setSel(-1);else if($('menu').hidden)showMenu();else void close();};document.addEventListener('keydown',onKey);
+ const onKey=e=>{if(!visible||e.key!=='Escape')return;if(!$('set').hidden)$('set').hidden=true;else if(!$('col').hidden)$('col').hidden=true;else if(selG||selT>=0)setSel(-1);else if($('menu').hidden)showMenu();else void close();};document.addEventListener('keydown',onKey);
  const ro=new ResizeObserver(()=>{layout();drawMeta();drawLogo();});ro.observe($('stage'));ro.observe($('metaCv'));const onResize=()=>layout();window.addEventListener('resize',onResize);const onHide=()=>void flush();window.addEventListener('pagehide',onHide);
  loadStage(data.cur);const parts=[];
  try{parts.push(await api.registerButton({name:'보석 십자수',icon:'💎',iconType:'html',location:'chat',id:'gem-stitch-menu'},open));}catch(e){console.warn('[보석 십자수] 버튼',e);}
