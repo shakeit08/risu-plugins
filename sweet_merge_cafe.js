@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.21.67
+//@version 2.21.68
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -786,7 +786,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, XMAS_CHAINS, XMAS_ART, SKIN_FACE, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest };
 })();
-const VER = '2.21.67';
+const VER = '2.21.68';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, XMAS_CHAINS, XMAS_ART, SKIN_FACE, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest } = ART;
@@ -1983,9 +1983,10 @@ function openWardrobe() {
 }
 function renderPassBtn() {
   const b = $('.mc-passb'); if (!b || !S) return;
-  const on = evOn(); b.style.display = on ? '' : 'none';
+  const on = evOn() && !S.onEv; b.style.display = on ? '' : 'none';
   if (on && !b._ic) { b._ic = 1; b.querySelector('i').innerHTML = iconAnimal(44); }
   if (on) b.querySelector('.dot').style.display = passReady() ? '' : 'none';
+  $('.tw-pass')?.classList.toggle('new', evOn() && passReady());
 }
 // 시즌 이벤트 버튼: 이벤트마다 전용 아이콘을 만들면 icon만 바꾸면 됨
 const EV_BTN = { name: '크리스마스', icon: () => ART_TOOLS && ART_TOOLS.ev_xmas ? `<img src="${ART_TOOLS.ev_xmas}" alt="">` : iconGen('xmas') };
@@ -2776,8 +2777,8 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 @media (max-width:480px){.mc-panel{width:100vw;height:100dvh;border:none;border-radius:0;box-shadow:none}}
 @media (min-width:481px) and (max-height:700px){.mc-panel{height:100dvh;border-top:none;border-bottom:none;border-radius:0;box-shadow:none}}
 .mc-zb{position:absolute;top:12px;right:12px;z-index:5;display:none;align-items:center;gap:5px;font-family:inherit;font-size:14px;color:#5b3a32;background:#fff7ec;border:2.5px solid #5b3a32;border-radius:99px;box-shadow:0 3px 0 #5b3a32;padding:5px 12px;cursor:pointer}#mc.zok .mc-zb{display:flex}#mc.big .mc-panel{width:580px}.mc-wrap{background-repeat:repeat-x,repeat}
-.mc-passb .pic{display:block}.tw-side.l .tw-spin{background:none!important;border:0!important;box-shadow:none!important;padding:0!important;border-radius:0!important}.tw-side.l .tw-spin>img,.tw-side.l .tw-spin>svg{border-radius:0!important;filter:drop-shadow(1.5px 0 0 #fff) drop-shadow(-1.5px 0 0 #fff) drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff) drop-shadow(0 2px 0 rgba(91,58,50,.3))}.tw-side.l .tw-spin:active{transform:translateY(2px) scale(.96)}.tw-ward .wi{display:block;width:100%;height:100%}.tw-ward .wi img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(1.5px 0 0 #fff) drop-shadow(-1.5px 0 0 #fff) drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff) drop-shadow(0 2px 0 rgba(91,58,50,.3))}
-.wd-r h4{margin:8px 0 5px}.wd-g{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.wd-c{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 4px;border:2.5px solid #5b3a32;border-radius:14px;background:#fff;font-family:inherit;color:#5b3a32;cursor:pointer}.wd-c i{display:block;width:58px;height:58px}.wd-c b{font-size:13.5px}.wd-c em{font-style:normal;font-size:11.5px;color:#fff;background:#ff8fa3;border-radius:99px;padding:1px 7px}.wd-c small{font-size:10.5px;line-height:1.25;text-align:center;color:#a07a6a}.wd-c.on{background:#fff0f3;box-shadow:0 0 0 3px #ff8fa3}.wd-c.lk{cursor:default;background:#f6efe8}.wd-c.lk i{opacity:.45;filter:grayscale(.5)}.wd-c .lock{position:absolute;right:5px;top:4px;font-size:13px}.ps-card{max-width:440px!important;width:94%}.mc-passb .dot{position:absolute;top:2px;right:6px;width:13px;height:13px;border-radius:50%;background:#ff5d73;border:2px solid #5b3a32}
+.mc-evb.mc-passb{background:#3fa66b;margin-left:6px}.mc-evb.mc-passb::after{display:none}.mc-passb .dot{position:absolute;top:-5px;right:-5px;width:14px;height:14px;border-radius:50%;background:#ff5d73;border:2px solid #5b3a32}.tw-side.l .tw-spin{background:none!important;border:0!important;box-shadow:none!important;padding:0!important;border-radius:0!important}.tw-side.l .tw-spin>img,.tw-side.l .tw-spin>svg{border-radius:0!important;filter:drop-shadow(1.5px 0 0 #fff) drop-shadow(-1.5px 0 0 #fff) drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff) drop-shadow(0 2px 0 rgba(91,58,50,.3))}.tw-side.l .tw-spin:active{transform:translateY(2px) scale(.96)}.tw-ward .wi{display:block;width:100%;height:100%}.tw-ward .wi img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(1.5px 0 0 #fff) drop-shadow(-1.5px 0 0 #fff) drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff) drop-shadow(0 2px 0 rgba(91,58,50,.3))}
+.wd-r h4{margin:8px 0 5px}.wd-g{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.wd-c{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 4px;border:2.5px solid #5b3a32;border-radius:14px;background:#fff;font-family:inherit;color:#5b3a32;cursor:pointer}.wd-c i{display:block;width:58px;height:58px}.wd-c b{font-size:13.5px}.wd-c em{font-style:normal;font-size:11.5px;color:#fff;background:#ff8fa3;border-radius:99px;padding:1px 7px}.wd-c small{font-size:10.5px;line-height:1.25;text-align:center;color:#a07a6a}.wd-c.on{background:#fff0f3;box-shadow:0 0 0 3px #ff8fa3}.wd-c.lk{cursor:default;background:#f6efe8}.wd-c.lk i{opacity:.45;filter:grayscale(.5)}.wd-c .lock{position:absolute;right:5px;top:4px;font-size:13px}.ps-card{max-width:440px!important;width:94%}
 .ps-hd{display:grid;grid-template-columns:1fr 34px 1fr;gap:6px;margin:4px 0 6px}.ps-hd>div{text-align:center;font-size:15px;padding:5px 4px;border-radius:12px;border:2.5px solid #5b3a32;display:flex;align-items:center;justify-content:center;gap:6px}
 .ps-hf{grid-column:1;background:#e8f1ff}.ps-hg{grid-column:3;background:#ffe36e}.ps-hd>div{white-space:nowrap;min-height:38px}.ps-hg .mc-btn{padding:2px 8px;font-size:12px;display:inline-flex;align-items:center;gap:2px;margin:0;box-shadow:0 2px 0 #5b3a32}.ps-hg .mc-btn i{display:inline-block;width:15px;height:15px}
 .ps-list{max-height:min(34vh,330px);overflow-y:auto;padding:2px}
@@ -3398,9 +3399,9 @@ function buildUI() {
         <button class="mc-stk mc-shopb2" data-act="shop" title="상점">${ART_TOOLS && ART_TOOLS.shop ? `<img src="${ART_TOOLS.shop}" alt="">` : ICO.shop}</button>
         ${APP ? '' : `<button class="mc-ib" data-act="close" title="닫기">${ICO.close}</button>`}
       </div>
-      <div class="mc-ordw"><button class="mc-evb" data-act="evsw"></button><div class="mc-orders"></div></div><div class="mc-osb"><i></i></div>
+      <div class="mc-ordw"><button class="mc-evb" data-act="evsw"></button><button class="mc-evb mc-passb" data-act="pass" title="시즌 패스" style="display:none"><i></i><span>패스</span><b class="dot"></b></button><div class="mc-orders"></div></div><div class="mc-osb"><i></i></div>
       <div class="mc-wrap"><div class="mc-board"></div><div class="mc-tmode"></div></div>
-      <div class="mc-bot"><button class="mc-fab mc-passb" data-act="pass" title="시즌 패스" style="display:none"><i class="pic"></i><span>패스</span><b class="dot"></b></button><button class="mc-fab mc-boxb" data-act="box" title="보관함"><i class="${ART_TOOLS && ART_TOOLS.box ? 'pic' : ''}">${ART_TOOLS && ART_TOOLS.box ? `<img src="${ART_TOOLS.box}" alt="">` : ICO.box}</i><span>보관함</span><b class="n"></b></button><div class="mc-info"></div><button class="mc-fab mc-cafeb" data-act="cafe" id="mc-cafeb" title="동네 꾸미기"><span class="ic ${ART_TOOLS && ART_TOOLS.town ? 'pic' : ''}">${ART_TOOLS && ART_TOOLS.town ? `<img src="${ART_TOOLS.town}" alt="">` : HOUSE}</span><span class="sv"><span class="v"></span><span class="st">${UI.star}</span></span><span class="dot"></span></button></div>
+      <div class="mc-bot"><button class="mc-fab mc-boxb" data-act="box" title="보관함"><i class="${ART_TOOLS && ART_TOOLS.box ? 'pic' : ''}">${ART_TOOLS && ART_TOOLS.box ? `<img src="${ART_TOOLS.box}" alt="">` : ICO.box}</i><span>보관함</span><b class="n"></b></button><div class="mc-info"></div><button class="mc-fab mc-cafeb" data-act="cafe" id="mc-cafeb" title="동네 꾸미기"><span class="ic ${ART_TOOLS && ART_TOOLS.town ? 'pic' : ''}">${ART_TOOLS && ART_TOOLS.town ? `<img src="${ART_TOOLS.town}" alt="">` : HOUSE}</span><span class="sv"><span class="v"></span><span class="st">${UI.star}</span></span><span class="dot"></span></button></div>
       <div class="mc-toasts"></div>
     </div>`;
   document.body.appendChild(root);
@@ -4779,7 +4780,7 @@ function openTown() {
   townCh = (AREAS[defaultArea()] && AREAS[defaultArea()].ch) || 1;
   v.innerHTML = `<div class="tw-hud"><div class="mc-pill tw-en" data-tw="shop"><span class="ic">${UI.bolt}</span><span class="v"></span><span class="pl">${ICO.plus}</span></div><div class="mc-pill tw-co" data-tw="shop"><span class="ic">${UI.coin}</span><span class="v"></span></div><div class="mc-sp"></div><div class="mc-pill cf-st"><span class="ic">${UI.star}</span><span class="v"></span>&nbsp;</div></div>
     <div class="tw-wrap"><div class="tw-scroll"><div class="tw-street"></div></div><div class="cf-ti tw-ti"></div>
-      <div class="tw-side l"><button class="tw-spin" data-tw="spin" title="오늘의 룰렛">${WHEEL ? `<img src="${WHEEL.btn}" alt="" draggable="false">` : '🎡'}<span class="dot"></span><span class="lb">룰렛</span></button><button class="tw-spin tw-draw" data-tw="draw" title="행운 뽑기">${DRAW_ICON()}<span class="lb">뽑기</span></button><button class="tw-spin tw-ward" data-tw="ward" title="옷장"><span class="wi">${WHEEL && WHEEL.ward ? `<img src="${WHEEL.ward}" alt="" draggable="false">` : iconAnimal(44)}</span><span class="lb">옷장</span></button></div>
+      <div class="tw-side l"><button class="tw-spin" data-tw="spin" title="오늘의 룰렛">${WHEEL ? `<img src="${WHEEL.btn}" alt="" draggable="false">` : '🎡'}<span class="dot"></span><span class="lb">룰렛</span></button><button class="tw-spin tw-draw" data-tw="draw" title="행운 뽑기">${DRAW_ICON()}<span class="lb">뽑기</span></button><button class="tw-spin tw-ward" data-tw="ward" title="옷장"><span class="wi">${WHEEL && WHEEL.ward ? `<img src="${WHEEL.ward}" alt="" draggable="false">` : iconAnimal(44)}</span><span class="lb">옷장</span></button>${evOn() ? `<button class="tw-spin tw-pass" data-tw="pass" title="시즌 패스">${iconAnimal(44)}<span class="dot"></span><span class="lb">패스</span></button>` : ''}</div>
       <div class="tw-side r"><button class="tw-spin tw-alb" data-tw="album" title="이야기 앨범">${ALBUM_ICON()}<span class="lb">앨범</span></button><button class="tw-spin tw-lst" data-tw="list" title="목록">${ICO.book}<span class="lb">목록</span></button></div>
       <button class="tw-spin tw-mail" data-tw="mail" title="우편함">${MAIL_ICON()}<span class="lb">우편함</span></button>
       <button class="tw-arr l" data-tw="arrL">‹</button><button class="tw-arr r" data-tw="arrR">›</button></div>
@@ -4836,6 +4837,7 @@ function openTown() {
     else if (a === 'mail') openMail();
     else if (a === 'draw') openDraw();
     else if (a === 'ward') openWardrobe();
+    else if (a === 'pass') openPass();
     else if (/^ch\d$/.test(a)) { townCh = +a[2]; stPop = null; v.querySelector('.tw-season')?.remove(); renderTown(true); }
     else if (/^v\d$/.test(a)) {
       const vi = +a[1], V = VILLAGES[vi]; stPop = null; v.querySelector('.tw-season')?.remove();
@@ -4882,7 +4884,7 @@ function villageDone(vi) {
 const chOf = A => A.event ? (seasonDone() ? 5 : done('station') ? 2 : 1) : (A.ch || 1);
 let twSeen = false;
 function renderTown(first) {
-  twSeen = true; setTimeout(applyZoom, 0);
+  twSeen = true; setTimeout(() => { applyZoom(); renderPassBtn(); }, 0);
   setTimeout(mailBadge, 0);
   { const ck = 'ch' + townCh + '_start'; if (townCh > 1 && STORY[ck] && !S.story.seen[ck] && chOpen(townCh) && nextTask(townCh)) setTimeout(() => { if ($('.mc-story')) return; if (townCh === 5 && !S.story.seen.ch5_invite) playStory('ch5_invite', () => playStory(ck)); else playStory(ck); }, 350); }
   const v = $('.mc-town'); if (!v) return;
