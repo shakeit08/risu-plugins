@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.21.69
+//@version 2.21.70
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -786,7 +786,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, XMAS_CHAINS, XMAS_ART, SKIN_FACE, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest };
 })();
-const VER = '2.21.69';
+const VER = '2.21.70';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, XMAS_CHAINS, XMAS_ART, SKIN_FACE, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest } = ART;
@@ -1770,7 +1770,7 @@ function sanitize(o) {
     if (M.got && typeof M.got === 'object') for (const k in M.got) if (M.got[k]) s.mail.got[String(k).slice(0, 60)] = 1;
     if (Array.isArray(M.list)) s.mail.list = M.list.filter(x => x && typeof x.id === 'string' && typeof x.t === 'string').slice(0, MAIL_MAX).map(x => ({ id: x.id.slice(0, 60), k: ['r', 'p', 'd'].includes(x.k) ? x.k : 'r', a: Number.isInteger(x.a) && ANIMALS[x.a] ? x.a : -1, from: String(x.from || '').slice(0, 20), ti: String(x.ti || '').slice(0, 40), t: x.t.slice(0, 400), rw: mailRw(x.rw), at: +x.at || 0, got: !!x.got }));
   }
-  if (o.shop && typeof o.shop.day === 'string') s.shop = { day: o.shop.day, buys: +o.shop.buys || 0 };
+  if (o.shop && typeof o.shop.day === 'string') s.shop = { day: o.shop.day, buys: +o.shop.buys || 0, free: !!o.shop.free };
   if (o.tools && typeof o.tools === 'object') for (const k of ['cut', 'up']) s.tools[k] = Math.max(0, Math.min(999, Math.floor(+o.tools[k] || 0)));
   if (Number.isInteger(o.storeN)) s.storeN = Math.max(STORE_START, Math.min(STORE_MAX, o.storeN));
   if (Array.isArray(o.store)) { const a = Array.from({ length: s.storeN }, (_, k) => savedSlot(o.store[k]) || null).filter(Boolean); s.store = Array.from({ length: s.storeN }, (_, k) => a[k] || null); }
@@ -2904,7 +2904,7 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 .mc-board.tmode .c:not(.tok) .it{opacity:.35}
 .mc-board .c.tok{box-shadow:inset 0 0 0 3px #ff8fa3}.mc-board .c.tok::before{content:'';position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 2.5px #ff8fa3,0 0 12px rgba(255,143,163,.95);pointer-events:none;z-index:2;will-change:opacity;animation:supg 1s ease-in-out infinite alternate}@keyframes suptk{to{box-shadow:inset 0 0 0 2.5px #ff8fa3,0 0 12px rgba(255,143,163,.95)}}
 .mc-boxb{position:relative;margin-right:0!important}.mc-shopb2{margin-right:auto}
-.mc-boxb .n{position:absolute;right:4px;top:-1px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#ff8fa3;color:#fff;border:2px solid #5b3a32;font-size:11px;font-weight:normal;line-height:13px;text-align:center}
+.mc-boxb>i{position:relative}.mc-boxb .n{position:absolute;right:-8px;top:-6px;font-style:normal;z-index:2;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#ff8fa3;color:#fff;border:2px solid #5b3a32;font-size:11px;font-weight:normal;line-height:13px;text-align:center}
 .mc-boxb.tgt{background:rgba(255,224,138,.75);border-radius:16px;transform:scale(1.1)}
 .mc-trow{display:flex;align-items:center;gap:9px;padding:5px 0}.mc-trow+.mc-trow{border-top:2px dashed #f0d9c2}
 .mc-trow .ti{width:42px;height:42px;flex-shrink:0}.mc-trow .tx{flex:1;min-width:0}.mc-trow b{font-weight:normal;font-size:16px}
@@ -3180,8 +3180,8 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 .mc-rb.mc-shopb2{padding:3px}
 .mc-rb:active{transform:translateY(2px);box-shadow:none}
 .mc-wrap{padding:0 4px}
-.mc-bot{display:flex;align-items:stretch;gap:6px;margin:8px 6px 8px;flex-shrink:0}
-.mc-bot .mc-info{flex:1;min-width:0;margin:0;position:relative;height:88px;padding:6px 8px}
+.mc-bot{display:flex;align-items:stretch;gap:6px;margin:6px 6px 18px;flex-shrink:0}
+.mc-bot .mc-info{flex:1;min-width:0;margin:0;position:relative;height:calc(88px + var(--infoX,0px));padding:6px 8px}
 .mc-info .tx>b:first-child{display:block;font-size:16px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:1px}
 .mc-info .ii{width:44px;height:44px}
 .mc-info .mc-btn{gap:2px;padding:4px 9px;font-size:14px;align-self:center}
@@ -3199,7 +3199,7 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 #mc.t1 .mc-info .ii{width:34px;height:34px}
 #mc.t2 .mc-bot .mc-fab{width:54px}
 #mc.t2 .mc-bot .mc-fab i,#mc.t2 .mc-bot .mc-cafeb .ic{width:28px;height:28px}
-#mc.t3 .mc-bot{margin:5px 6px 6px}
+#mc.t3 .mc-bot{margin:4px 6px 12px}
 
 #mc.t3 .mc-bot .mc-info{height:60px;padding-top:4px;padding-bottom:4px}
 #mc.t3 .mc-info .ii{width:26px;height:26px}
@@ -3279,8 +3279,9 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 .mc-orders{display:flex;overflow-x:auto;overflow-y:hidden;gap:6px;padding:2px 8px 5px;scroll-snap-type:x proximity;scroll-padding:0 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-x}
 .mc-orders::-webkit-scrollbar{display:none}
 .mc-orders::after{content:'';flex:0 0 2px}
-.mc-ord{flex:0 0 148px;scroll-snap-align:start}
-.mc-ord .row>.rq{flex-basis:42px!important}
+.mc-ord{flex:0 0 calc(148px + var(--ordQ,0px) * 3);scroll-snap-align:start}
+.mc-ord .row>.rq{flex-basis:calc(42px + var(--ordQ,0px))!important}
+#mc:not(.t1) .mc-ord .hd .fc{width:calc(54px + var(--ordQ,0px));height:calc(54px + var(--ordQ,0px))}
 .mc-osb{position:relative;height:8px;margin:0 14px 6px;border-radius:99px;background:#f0d9c2;border:2px solid #5b3a32;flex-shrink:0;touch-action:none;cursor:pointer;box-sizing:content-box}
 .mc-osb i{position:absolute;top:0;bottom:0;left:0;border-radius:99px;background:#ff8fa3}
 .mc-osb.off{visibility:hidden}
@@ -3366,7 +3367,12 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 /* short screens: one line, item description only (no level text) */
 #mc.t1 .mc-info .lvp,#mc.t2 .mc-info .lvp,#mc.t3 .mc-info .lvp{display:none}
 #mc.t3 .mc-info .tx>b:first-child{font-size:14px;line-height:1.2}
-.mc-bot .mc-info .tx{align-self:flex-start;margin-top:-1px}.mc-bot .mc-info .tx>b:first-child{line-height:1.15;margin-bottom:2px}.mc-bot .mc-info .mc-sub{-webkit-line-clamp:3;font-size:13px;line-height:1.28}#mc.t1 .mc-bot .mc-info .mc-sub,#mc.t3 .mc-bot .mc-info .mc-sub{-webkit-line-clamp:2;font-size:12.5px;line-height:1.25}
+.sh-free{display:flex;align-items:center;gap:10px;background:#fff;border:2.5px solid #5b3a32;border-radius:16px;padding:8px 12px;margin:4px 0 10px;box-shadow:0 3px 0 #5b3a32}.sh-free .ic{width:52px;height:52px;flex-shrink:0}.sh-free .t{flex:1;display:flex;flex-direction:column}.sh-free .t b{font-size:17px;font-weight:normal}.sh-free.got{opacity:.6}
+.sh-g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px}
+.sh-c{display:flex;flex-direction:column;align-items:center;gap:3px;background:#fff;border:2px solid #f0d9c2;border-radius:16px;padding:10px 4px 8px;text-align:center;min-width:0}
+.sh-c .ic{width:56px;height:56px}.sh-c b{font-size:14.5px;font-weight:normal;line-height:1.2;word-break:keep-all}.sh-c .mc-sub{font-size:12px}
+.sh-c .mc-btn{margin-top:4px;padding:5px 10px;font-size:15px;display:inline-flex;align-items:center;gap:3px}.sh-c .mc-btn i{width:17px;height:17px}.sh-c .mc-btn.dn{background:#eee;color:#9a8478;box-shadow:none;font-size:12.5px}
+.mc-bot .mc-info .tx{align-self:flex-start;margin-top:-1px}.mc-bot .mc-info>.ii{width:auto!important;height:100%!important;max-height:calc(70px + var(--infoX,0px) * .4);align-self:center;aspect-ratio:1;flex-shrink:0}.mc-bot .mc-fab,.mc-bot .mc-cafeb{align-self:center}.mc-bot .mc-info .tx>b:first-child{font-size:calc(18px + var(--infoX,0px) / 8)}.mc-bot .mc-info .tx{align-self:center!important}.mc-bot .mc-info .mc-sub{font-size:calc(13px + var(--infoX,0px) / 12)!important;line-height:1.3!important}#mc.t1 .mc-bot .mc-info .tx>b:first-child{font-size:16px}#mc.t1 .mc-bot .mc-info .mc-sub,#mc.t3 .mc-bot .mc-info .mc-sub{font-size:13px!important}#mc.t3 .mc-bot .mc-info .tx>b:first-child{font-size:15px}.mc-bot .mc-info .tx>b:first-child{line-height:1.15;margin-bottom:2px}.mc-bot .mc-info .mc-sub{-webkit-line-clamp:4;font-size:13px;line-height:1.28}#mc.t1 .mc-bot .mc-info .mc-sub,#mc.t3 .mc-bot .mc-info .mc-sub{-webkit-line-clamp:2;font-size:12.5px;line-height:1.25}
 
 /* village / chapter tabs (2 rows) */
 .tw-wrap .tw-ti{display:flex;flex-direction:column;align-items:center;gap:4px}
@@ -3402,7 +3408,7 @@ function buildUI() {
       </div>
       <div class="mc-ordw"><button class="mc-evb" data-act="evsw"></button><button class="mc-evb mc-passb" data-act="pass" title="시즌 패스" style="display:none"><i></i><span>패스</span><b class="dot"></b></button><div class="mc-orders"></div></div><div class="mc-osb"><i></i></div>
       <div class="mc-wrap"><div class="mc-board"></div><div class="mc-tmode"></div></div>
-      <div class="mc-bot"><button class="mc-fab mc-boxb" data-act="box" title="보관함"><i class="${ART_TOOLS && ART_TOOLS.box ? 'pic' : ''}">${ART_TOOLS && ART_TOOLS.box ? `<img src="${ART_TOOLS.box}" alt="">` : ICO.box}</i><span>보관함</span><b class="n"></b></button><div class="mc-info"></div><button class="mc-fab mc-cafeb" data-act="cafe" id="mc-cafeb" title="동네 꾸미기"><span class="ic ${ART_TOOLS && ART_TOOLS.town ? 'pic' : ''}">${ART_TOOLS && ART_TOOLS.town ? `<img src="${ART_TOOLS.town}" alt="">` : HOUSE}</span><span class="sv"><span class="v"></span><span class="st">${UI.star}</span></span><span class="dot"></span></button></div>
+      <div class="mc-bot"><button class="mc-fab mc-boxb" data-act="box" title="보관함"><i class="${ART_TOOLS && ART_TOOLS.box ? 'pic' : ''}">${ART_TOOLS && ART_TOOLS.box ? `<img src="${ART_TOOLS.box}" alt="">` : ICO.box}<b class="n"></b></i><span>보관함</span></button><div class="mc-info"></div><button class="mc-fab mc-cafeb" data-act="cafe" id="mc-cafeb" title="동네 꾸미기"><span class="ic ${ART_TOOLS && ART_TOOLS.town ? 'pic' : ''}">${ART_TOOLS && ART_TOOLS.town ? `<img src="${ART_TOOLS.town}" alt="">` : HOUSE}</span><span class="sv"><span class="v"></span><span class="st">${UI.star}</span></span><span class="dot"></span></button></div>
       <div class="mc-toasts"></div>
     </div>`;
   document.body.appendChild(root);
@@ -3504,11 +3510,26 @@ function layout() {
   const fit = () => !bd || (bd.offsetHeight + swH() <= wrap.clientHeight - 4 && bd.offsetWidth <= wrap.clientWidth - 8);
   const byWidth = () => Math.floor(Math.max(24, Math.min((Math.min(wrap.clientWidth, mc.classList.contains('big') ? 444 : 1e9) - 8 - 18 - 6 * 3) / COLS, 74)));
   let cell = 0;
+  // 판이 가로폭에 맞춰져 세로로 공간이 남으면, 남는 높이를 주문표와 아래 설명칸에 나눠 줌
+  const key = innerWidth + 'x' + innerHeight + ':' + PZ + ':' + (S && S.onEv ? 1 : 0);
+  if (mc._sx !== key) { mc.style.setProperty('--ordQ', '0px'); mc.style.setProperty('--infoX', '0px'); }
   for (let t = 0; t <= (APP ? 3 : 0); t++) {
     mc.classList.toggle('t1', t >= 1); mc.classList.toggle('t2', t >= 2); mc.classList.toggle('t3', t >= 3);
     cell = byWidth(); mc.style.setProperty('--cell', cell + 'px');
-    if (fit()) return;
+    if (fit()) {
+      if (t === 0 && bd && mc._sx !== key) {
+        const extra = wrap.clientHeight - 4 - swH() - bd.offsetHeight;
+        if (extra > 12) {
+          const q = Math.min(12, Math.floor(extra / 2 / 2.2)), ix = Math.min(36, Math.floor(extra / 2));
+          mc.style.setProperty('--ordQ', q + 'px'); mc.style.setProperty('--infoX', ix + 'px');
+          if (!fit()) { mc.style.setProperty('--ordQ', '0px'); mc.style.setProperty('--infoX', '0px'); }
+        }
+        mc._sx = key;
+      }
+      return;
+    }
   }
+  mc._sx = '';
   const H = wrap.clientHeight - 4 - swH();
   cell = Math.floor(Math.max(24, Math.min(cell, (H - 18 - (ROWS - 1) * 3) / ROWS)));
   mc.style.setProperty('--cell', cell + 'px');
@@ -4333,22 +4354,13 @@ function openShop(fromEmpty) {
   if (S.shop.day !== today()) S.shop = { day: today(), buys: 0 };
   const price = energyPrice(S.shop.buys);
   if (S.tbuy.d !== today()) S.tbuy = { d: today(), cut: 0, up: 0 };
+  const card = (ic, name, sub, btn) => `<div class="sh-c"><div class="ic">${ic}</div><b>${name}</b>${sub ? `<span class="mc-sub">${sub}</span>` : '<span class="mc-sub">&nbsp;</span>'}${btn}</div>`;
   const m = modal(`<h3>상점</h3>
     ${fromEmpty ? '<p>에너지가 다 떨어졌어요!</p>' : ''}
-    <div class="mc-sec" style="display:flex;align-items:center;gap:10px">
-      <div style="width:46px;height:46px;flex-shrink:0">${UI.bolt}</div>
-      <div style="flex:1"><div style="font-size:18px">에너지 +100</div><div class="mc-sub">오늘 ${S.shop.buys}번 구매 · 살 때마다 값이 두 배로 올라요</div></div>
-      <button class="mc-btn pk" data-buy ${S.coins < price ? 'disabled' : ''}><i>${UI.coin}</i>${price}</button>
-    </div>
-    ${['cut', 'up'].map(k => { const T = TOOLS[k], got = S.tbuy[k] >= 1; return `<div class="mc-sec" style="display:flex;align-items:center;gap:10px">
-      <div style="width:46px;height:46px;flex-shrink:0">${toolIcon(k)}</div>
-      <div style="flex:1"><div style="font-size:18px">${esc(T.name)} <span class="mc-sub">보유 ${toolCount(k)}</span></div><div class="mc-sub">${esc(T.desc)} · 하루 1개</div></div>
-      ${got ? '<span class="mc-sub" style="white-space:nowrap">오늘 구매 완료</span>' : `<button class="mc-btn pk" data-tbuy="${k}" ${S.coins < T.price ? 'disabled' : ''}><i>${UI.coin}</i>${T.price}</button>`}
-    </div>`; }).join('')}
-    <div class="mc-sec mc-sub" style="line-height:1.6">
-      · 에너지는 ${regenMs() / 1000}초마다 1씩, 최대 ${maxE()}까지 차요.<br>
-      ${APP ? '' : `· 채팅을 보낼 때마다 ${S.settings.chatE ? `+${S.settings.chatE + D('lamp')}` : '(설정에서 끔)'} 충전돼요.<br>`}
-      · 일부 손님은 주문 보상으로 에너지를 줘요.
+    <div class="sh-free ${S.shop.free ? 'got' : ''}"><div class="ic">${iconChest(1)}</div><div class="t"><b>오늘의 무료 선물</b><span class="mc-sub">${esc(CHEST[1].name)} · 하루 한 번</span></div>${S.shop.free ? '<span class="mc-sub">받았어요</span>' : '<button class="mc-btn mt" data-free>받기</button>'}</div>
+    <div class="sh-g">
+      ${card(UI.bolt, '에너지 +100', '', `<button class="mc-btn pk" data-buy ${S.coins < price ? 'disabled' : ''}><i>${UI.coin}</i>${price}</button>`)}
+      ${['cut', 'up'].map(k => { const T = TOOLS[k], got = S.tbuy[k] >= 1; return card(toolIcon(k), esc(T.name), `보유 ${toolCount(k)}`, got ? '<span class="mc-btn dn">구매 완료</span>' : `<button class="mc-btn pk" data-tbuy="${k}" ${S.coins < T.price ? 'disabled' : ''}><i>${UI.coin}</i>${T.price}</button>`); }).join('')}
     </div>
     <div class="acts"><button class="mc-btn wh" data-x>닫기</button></div>`);
   // 생산기를 연타하다 열린 창이면, 연타가 멈출 때까지(0.5초) 창 안의 버튼이 눌리지 않게 막음 (실수로 에너지 구매 방지)
@@ -4357,6 +4369,12 @@ function openShop(fromEmpty) {
     m.addEventListener('pointerdown', () => { if (Date.now() < lockT) lockT = Date.now() + 500; }, true);
     m.addEventListener('click', ev => { if (Date.now() < lockT) { ev.stopPropagation(); ev.preventDefault(); } }, true);
   }
+  m.querySelector('[data-free]')?.addEventListener('click', () => {
+    if (S.shop.free) return;
+    S.shop.free = true; const g = drawGive('box', 1); sfx('coin');
+    m.remove(); renderTop(); save();
+    toast(`<b>${esc(g.txt)}</b> ${esc(g.sub)}`, { icon: g.icon });
+  });
   m.querySelectorAll('[data-tbuy]').forEach(b => b.addEventListener('click', () => {
     const k = b.dataset.tbuy, T = TOOLS[k];
     if (S.coins < T.price || S.tbuy[k] >= 1) return;
