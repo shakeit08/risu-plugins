@@ -1,7 +1,7 @@
 //@name sweet_merge_cafe
 //@display-name 🧁 달콤 머지 카페
 //@api 3.0
-//@version 2.21.68
+//@version 2.21.69
 //@update-url https://raw.githubusercontent.com/shakeit08/risu-plugins/main/sweet_merge_cafe.js
 
 // 달콤 머지 카페 — 리스 채팅 중에 즐기는 디저트 카페 머지 게임
@@ -786,7 +786,7 @@ function lockedScene(name) {
 const esc2 = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 return { CHAINS, CHAIN_KEYS, XMAS_CHAINS, XMAS_ART, SKIN_FACE, ART_ITEMS, ART_GENS, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest };
 })();
-const VER = '2.21.68';
+const VER = '2.21.69';
 
 // ===================== GAME =====================
 const { CHAINS, CHAIN_KEYS, XMAS_CHAINS, XMAS_ART, SKIN_FACE, ANIMALS, UI, iconItem, iconGen, genName, hasGenArt, iconBag, iconAnimal, cafeScene, areaScene, lockedScene, SPOT_BOX, CAFE_BOX, paintBox, spotPos, HOUSE, townLot, townFence, TOWN_BG, TOWN_BG2, WALK, ST_IMG, DEB_IMG, ST_DIM, MAP, ART_TOOLS, WHEEL, EXT_FILES, extFill, STORY_IMG, iconRes, iconChest } = ART;
@@ -2904,7 +2904,7 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 .mc-board.tmode .c:not(.tok) .it{opacity:.35}
 .mc-board .c.tok{box-shadow:inset 0 0 0 3px #ff8fa3}.mc-board .c.tok::before{content:'';position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 2.5px #ff8fa3,0 0 12px rgba(255,143,163,.95);pointer-events:none;z-index:2;will-change:opacity;animation:supg 1s ease-in-out infinite alternate}@keyframes suptk{to{box-shadow:inset 0 0 0 2.5px #ff8fa3,0 0 12px rgba(255,143,163,.95)}}
 .mc-boxb{position:relative;margin-right:0!important}.mc-shopb2{margin-right:auto}
-.mc-boxb .n{position:absolute;right:-6px;top:-7px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#ff8fa3;color:#fff;border:2px solid #5b3a32;font-size:11px;font-weight:normal;line-height:13px;text-align:center}
+.mc-boxb .n{position:absolute;right:4px;top:-1px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#ff8fa3;color:#fff;border:2px solid #5b3a32;font-size:11px;font-weight:normal;line-height:13px;text-align:center}
 .mc-boxb.tgt{background:rgba(255,224,138,.75);border-radius:16px;transform:scale(1.1)}
 .mc-trow{display:flex;align-items:center;gap:9px;padding:5px 0}.mc-trow+.mc-trow{border-top:2px dashed #f0d9c2}
 .mc-trow .ti{width:42px;height:42px;flex-shrink:0}.mc-trow .tx{flex:1;min-width:0}.mc-trow b{font-weight:normal;font-size:16px}
@@ -3181,7 +3181,7 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 .mc-rb:active{transform:translateY(2px);box-shadow:none}
 .mc-wrap{padding:0 4px}
 .mc-bot{display:flex;align-items:stretch;gap:6px;margin:8px 6px 8px;flex-shrink:0}
-.mc-bot .mc-info{flex:1;min-width:0;margin:0;position:relative;height:78px;padding:6px 8px}
+.mc-bot .mc-info{flex:1;min-width:0;margin:0;position:relative;height:88px;padding:6px 8px}
 .mc-info .tx>b:first-child{display:block;font-size:16px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:1px}
 .mc-info .ii{width:44px;height:44px}
 .mc-info .mc-btn{gap:2px;padding:4px 9px;font-size:14px;align-self:center}
@@ -3195,13 +3195,13 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 .mc-wrap{flex-direction:column}
 .mc-top .mc-sw{height:34px;font-size:14px;padding:0 7px 0 4px}
 .mc-top .mc-sw i{width:18px;height:18px}
-#mc.t1 .mc-bot .mc-info{height:64px;padding-top:4px;padding-bottom:4px}
+#mc.t1 .mc-bot .mc-info{height:74px;padding-top:4px;padding-bottom:4px}
 #mc.t1 .mc-info .ii{width:34px;height:34px}
 #mc.t2 .mc-bot .mc-fab{width:54px}
 #mc.t2 .mc-bot .mc-fab i,#mc.t2 .mc-bot .mc-cafeb .ic{width:28px;height:28px}
 #mc.t3 .mc-bot{margin:5px 6px 6px}
 
-#mc.t3 .mc-bot .mc-info{height:52px;padding-top:4px;padding-bottom:4px}
+#mc.t3 .mc-bot .mc-info{height:60px;padding-top:4px;padding-bottom:4px}
 #mc.t3 .mc-info .ii{width:26px;height:26px}
 #mc.t3 .mc-bot .mc-fab{width:48px}
 #mc.t3 .mc-bot .mc-boxb span{display:none}
@@ -3279,8 +3279,8 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 .mc-orders{display:flex;overflow-x:auto;overflow-y:hidden;gap:6px;padding:2px 8px 5px;scroll-snap-type:x proximity;scroll-padding:0 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-x}
 .mc-orders::-webkit-scrollbar{display:none}
 .mc-orders::after{content:'';flex:0 0 2px}
-.mc-ord{flex:0 0 140px;scroll-snap-align:start}
-.mc-ord .row>.rq{flex-basis:38px!important}
+.mc-ord{flex:0 0 148px;scroll-snap-align:start}
+.mc-ord .row>.rq{flex-basis:42px!important}
 .mc-osb{position:relative;height:8px;margin:0 14px 6px;border-radius:99px;background:#f0d9c2;border:2px solid #5b3a32;flex-shrink:0;touch-action:none;cursor:pointer;box-sizing:content-box}
 .mc-osb i{position:absolute;top:0;bottom:0;left:0;border-radius:99px;background:#ff8fa3}
 .mc-osb.off{visibility:hidden}
@@ -3366,6 +3366,7 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 /* short screens: one line, item description only (no level text) */
 #mc.t1 .mc-info .lvp,#mc.t2 .mc-info .lvp,#mc.t3 .mc-info .lvp{display:none}
 #mc.t3 .mc-info .tx>b:first-child{font-size:14px;line-height:1.2}
+.mc-bot .mc-info .tx{align-self:flex-start;margin-top:-1px}.mc-bot .mc-info .tx>b:first-child{line-height:1.15;margin-bottom:2px}.mc-bot .mc-info .mc-sub{-webkit-line-clamp:3;font-size:13px;line-height:1.28}#mc.t1 .mc-bot .mc-info .mc-sub,#mc.t3 .mc-bot .mc-info .mc-sub{-webkit-line-clamp:2;font-size:12.5px;line-height:1.25}
 
 /* village / chapter tabs (2 rows) */
 .tw-wrap .tw-ti{display:flex;flex-direction:column;align-items:center;gap:4px}
